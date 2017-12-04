@@ -18,7 +18,7 @@ public class StartWindow extends JFrame{ //StartWindow is a top-level container
         setJMenuBar(createMenuBar());
         cp.add(new LeftPanel());
         setVisible(true);
-    }/ghjfjghj
+    }
 
     public class LeftPanel extends JPanel{
 
