@@ -1,6 +1,6 @@
 import java.util.Stack;
 
-/* Implements SeaBattle game, Player vs Computer. Number of ships and its length is fix. Player can place ships manually or automatically (random) ljjljj
+/* Implements SeaBattle game, Player vs Computer. Number of ships and its length is fix. Player can place ships manually or automatically (random)
  */
 public class SeaBattle implements PlayerAction {
     private final int[] shipsSize = {0, 4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
