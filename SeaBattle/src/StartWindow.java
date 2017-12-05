@@ -6,17 +6,22 @@ import java.awt.event.WindowListener;
 
 public class StartWindow extends JFrame{ //StartWindow is a top-level container
     Container cp;
+    JPanel helpPanel;
 
     public StartWindow(){
         cp=getContentPane(); //top-level container
-        cp.setLayout(new FlowLayout()); //default arrange components
-        setSize(1000,500);
-        //pack();
+        cp.setLayout(new BorderLayout()); //default arrange components
+        helpPanel=new JPanel();
+        helpPanel.setPreferredSize(new Dimension(800,100));
+        helpPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
         setTitle("Sea Battle");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //stop execute code when user close frame window; without this app would be still running;
         setJMenuBar(createMenuBar());
-        cp.add(new LeftPanel());
+        cp.add(helpPanel,BorderLayout.NORTH);
+        cp.add(new LeftPanel(),BorderLayout.WEST);
+        cp.add(new LeftPanel(),BorderLayout.EAST);
+        pack();
         setVisible(true);
     }
 
@@ -26,10 +31,12 @@ public class StartWindow extends JFrame{ //StartWindow is a top-level container
             super.paintComponent(g);
             g.drawString("This is left Panel!",10,20);
             setBorder(BorderFactory.createLineBorder(Color.black));
-            setBounds(25,25,450,450);
         }
 
-
+        @Override
+        public Dimension getPreferredSize() {
+            return new Dimension(400,400);
+        }
     }
 
     public JPanel chooseGameMode(){

@@ -419,15 +419,6 @@ public final class StdDrawForSeaBattle implements ActionListener, MouseListener,
     }
 
     /**
-     * Returns the current font.
-     *
-     * @return the current font
-     */
-    public static Font getFont() {
-        return font;
-    }
-
-    /**
      * Sets the font to the specified value.
      *
      * @param font the font
@@ -536,30 +527,6 @@ public final class StdDrawForSeaBattle implements ActionListener, MouseListener,
         draw();
     }
 
-
-    /**
-     * Draws an ellipse with the specified semimajor and semiminor axes,
-     * centered at (<em>x</em>, <em>y</em>).
-     *
-     * @param x             the <em>x</em>-coordinate of the center of the ellipse
-     * @param y             the <em>y</em>-coordinate of the center of the ellipse
-     * @param semiMajorAxis is the semimajor axis of the ellipse
-     * @param semiMinorAxis is the semiminor axis of the ellipse
-     * @throws IllegalArgumentException if either {@code semiMajorAxis}
-     *                                  or {@code semiMinorAxis} is negative
-     */
-    public static void ellipse(double x, double y, double semiMajorAxis, double semiMinorAxis) {
-        if (!(semiMajorAxis >= 0)) throw new IllegalArgumentException("ellipse semimajor axis must be nonnegative");
-        if (!(semiMinorAxis >= 0)) throw new IllegalArgumentException("ellipse semiminor axis must be nonnegative");
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(2 * semiMajorAxis);
-        double hs = factorY(2 * semiMinorAxis);
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else offscreen.draw(new Ellipse2D.Double(xs - ws / 2, ys - hs / 2, ws, hs));
-        draw();
-    }
-
     /**
      * Draws an ellipse with the specified semimajor and semiminor axes,
      * centered at (<em>x</em>, <em>y</em>).
@@ -580,31 +547,6 @@ public final class StdDrawForSeaBattle implements ActionListener, MouseListener,
         double hs = factorY(2 * semiMinorAxis);
         if (ws <= 1 && hs <= 1) pixel(x, y);
         else offscreen.fill(new Ellipse2D.Double(xs - ws / 2, ys - hs / 2, ws, hs));
-        draw();
-    }
-
-
-    /**
-     * Draws a circular arc of the specified radius,
-     * centered at (<em>x</em>, <em>y</em>), from angle1 to angle2 (in degrees).
-     *
-     * @param x      the <em>x</em>-coordinate of the center of the circle
-     * @param y      the <em>y</em>-coordinate of the center of the circle
-     * @param radius the radius of the circle
-     * @param angle1 the starting angle. 0 would mean an arc beginning at 3 o'clock.
-     * @param angle2 the angle at the end of the arc. For example, if
-     *               you want a 90 degree arc, then angle2 should be angle1 + 90.
-     * @throws IllegalArgumentException if {@code radius} is negative
-     */
-    public static void arc(double x, double y, double radius, double angle1, double angle2) {
-        if (radius < 0) throw new IllegalArgumentException("arc radius must be nonnegative");
-        while (angle2 < angle1) angle2 += 360;
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(2 * radius);
-        double hs = factorY(2 * radius);
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else offscreen.draw(new Arc2D.Double(xs - ws / 2, ys - hs / 2, ws, hs, angle1, angle2 - angle1, Arc2D.OPEN));
         draw();
     }
 
@@ -691,380 +633,6 @@ public final class StdDrawForSeaBattle implements ActionListener, MouseListener,
 
 
     /**
-     * Draws a polygon with the vertices
-     * (<em>x</em><sub>0</sub>, <em>y</em><sub>0</sub>),
-     * (<em>x</em><sub>1</sub>, <em>y</em><sub>1</sub>), ...,
-     * (<em>x</em><sub><em>n</em>–1</sub>, <em>y</em><sub><em>n</em>–1</sub>).
-     *
-     * @param x an array of all the <em>x</em>-coordinates of the polygon
-     * @param y an array of all the <em>y</em>-coordinates of the polygon
-     * @throws IllegalArgumentException unless {@code x[]} and {@code y[]}
-     *                                  are of the same length
-     */
-    public static void polygon(double[] x, double[] y) {
-        if (x == null) throw new IllegalArgumentException("x-coordinate array is null");
-        if (y == null) throw new IllegalArgumentException("y-coordinate array is null");
-        int n1 = x.length;
-        int n2 = y.length;
-        if (n1 != n2) throw new IllegalArgumentException("arrays must be of the same length");
-        int n = n1;
-        if (n == 0) return;
-
-        GeneralPath path = new GeneralPath();
-        path.moveTo((float) scaleX(x[0]), (float) scaleY(y[0]));
-        for (int i = 0; i < n; i++)
-            path.lineTo((float) scaleX(x[i]), (float) scaleY(y[i]));
-        path.closePath();
-        offscreen.draw(path);
-        draw();
-    }
-
-    /**
-     * Draws a polygon with the vertices
-     * (<em>x</em><sub>0</sub>, <em>y</em><sub>0</sub>),
-     * (<em>x</em><sub>1</sub>, <em>y</em><sub>1</sub>), ...,
-     * (<em>x</em><sub><em>n</em>–1</sub>, <em>y</em><sub><em>n</em>–1</sub>).
-     *
-     * @param x an array of all the <em>x</em>-coordinates of the polygon
-     * @param y an array of all the <em>y</em>-coordinates of the polygon
-     * @throws IllegalArgumentException unless {@code x[]} and {@code y[]}
-     *                                  are of the same length
-     */
-    public static void filledPolygon(double[] x, double[] y) {
-        if (x == null) throw new IllegalArgumentException("x-coordinate array is null");
-        if (y == null) throw new IllegalArgumentException("y-coordinate array is null");
-        int n1 = x.length;
-        int n2 = y.length;
-        if (n1 != n2) throw new IllegalArgumentException("arrays must be of the same length");
-        int n = n1;
-        if (n == 0) return;
-
-        GeneralPath path = new GeneralPath();
-        path.moveTo((float) scaleX(x[0]), (float) scaleY(y[0]));
-        for (int i = 0; i < n; i++)
-            path.lineTo((float) scaleX(x[i]), (float) scaleY(y[i]));
-        path.closePath();
-        offscreen.fill(path);
-        draw();
-    }
-
-
-    /***************************************************************************
-     *  Drawing images.
-     ***************************************************************************/
-    // get an image from the given filename
-    private static Image getImage(String filename) {
-        if (filename == null) throw new IllegalArgumentException();
-
-        // to read from file
-        ImageIcon icon = new ImageIcon(filename);
-
-        // try to read from URL
-        if ((icon == null) || (icon.getImageLoadStatus() != MediaTracker.COMPLETE)) {
-            try {
-                URL url = new URL(filename);
-                icon = new ImageIcon(url);
-            } catch (MalformedURLException e) {
-                /* not a url */
-            }
-        }
-
-        // in case file is inside a .jar (classpath relative to StdDraw)
-        if ((icon == null) || (icon.getImageLoadStatus() != MediaTracker.COMPLETE)) {
-            URL url = StdDrawForSeaBattle.class.getResource(filename);
-            if (url != null)
-                icon = new ImageIcon(url);
-        }
-
-        // in case file is inside a .jar (classpath relative to root of jar)
-        if ((icon == null) || (icon.getImageLoadStatus() != MediaTracker.COMPLETE)) {
-            URL url = StdDrawForSeaBattle.class.getResource("/" + filename);
-            if (url == null) throw new IllegalArgumentException("image " + filename + " not found");
-            icon = new ImageIcon(url);
-        }
-
-        return icon.getImage();
-    }
-
-    /***************************************************************************
-     * [Summer 2016] Should we update to use ImageIO instead of ImageIcon()?
-     *               Seems to have some issues loading images on some systems
-     *               and slows things down on other systems.
-     *               especially if you don't call ImageIO.setUseCache(false)
-     *               One advantage is that it returns a BufferedImage.
-     ***************************************************************************/
-/*
-    private static BufferedImage getImage(String filename) {
-        if (filename == null) throw new IllegalArgumentException();
-
-        // from a file or URL
-        try {
-            URL url = new URL(filename);
-            BufferedImage image = ImageIO.read(url);
-            return image;
-        } 
-        catch (IOException e) {
-            // ignore
-        }
-
-        // in case file is inside a .jar (classpath relative to StdDraw)
-        try {
-            URL url = StdDraw.class.getResource(filename);
-            BufferedImage image = ImageIO.read(url);
-            return image;
-        } 
-        catch (IOException e) {
-            // ignore
-        }
-
-        // in case file is inside a .jar (classpath relative to root of jar)
-        try {
-            URL url = StdDraw.class.getResource("/" + filename);
-            BufferedImage image = ImageIO.read(url);
-            return image;
-        } 
-        catch (IOException e) {
-            // ignore
-        }
-        throw new IllegalArgumentException("image " + filename + " not found");
-    }
-*/
-
-    /**
-     * Draws the specified image centered at (<em>x</em>, <em>y</em>).
-     * The supported image formats are JPEG, PNG, and GIF.
-     * As an optimization, the picture is cached, so there is no performance
-     * penalty for redrawing the same image multiple times (e.g., in an animation).
-     * However, if you change the picture file after drawing it, subsequent
-     * calls will draw the original picture.
-     *
-     * @param x        the center <em>x</em>-coordinate of the image
-     * @param y        the center <em>y</em>-coordinate of the image
-     * @param filename the name of the image/picture, e.g., "ball.gif"
-     * @throws IllegalArgumentException if the image filename is invalid
-     */
-    public static void picture(double x, double y, String filename) {
-        // BufferedImage image = getImage(filename);
-        Image image = getImage(filename);
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        // int ws = image.getWidth();    // can call only if image is a BufferedImage
-        // int hs = image.getHeight();
-        int ws = image.getWidth(null);
-        int hs = image.getHeight(null);
-        if (ws < 0 || hs < 0) throw new IllegalArgumentException("image " + filename + " is corrupt");
-
-        offscreen.drawImage(image, (int) Math.round(xs - ws / 2.0), (int) Math.round(ys - hs / 2.0), null);
-        draw();
-    }
-
-    /**
-     * Draws the specified image centered at (<em>x</em>, <em>y</em>),
-     * rotated given number of degrees.
-     * The supported image formats are JPEG, PNG, and GIF.
-     *
-     * @param x        the center <em>x</em>-coordinate of the image
-     * @param y        the center <em>y</em>-coordinate of the image
-     * @param filename the name of the image/picture, e.g., "ball.gif"
-     * @param degrees  is the number of degrees to rotate counterclockwise
-     * @throws IllegalArgumentException if the image filename is invalid
-     */
-    public static void picture(double x, double y, String filename, double degrees) {
-        // BufferedImage image = getImage(filename);
-        Image image = getImage(filename);
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        // int ws = image.getWidth();    // can call only if image is a BufferedImage
-        // int hs = image.getHeight();
-        int ws = image.getWidth(null);
-        int hs = image.getHeight(null);
-        if (ws < 0 || hs < 0) throw new IllegalArgumentException("image " + filename + " is corrupt");
-
-        offscreen.rotate(Math.toRadians(-degrees), xs, ys);
-        offscreen.drawImage(image, (int) Math.round(xs - ws / 2.0), (int) Math.round(ys - hs / 2.0), null);
-        offscreen.rotate(Math.toRadians(+degrees), xs, ys);
-
-        draw();
-    }
-
-    /**
-     * Draws the specified image centered at (<em>x</em>, <em>y</em>),
-     * rescaled to the specified bounding box.
-     * The supported image formats are JPEG, PNG, and GIF.
-     *
-     * @param x            the center <em>x</em>-coordinate of the image
-     * @param y            the center <em>y</em>-coordinate of the image
-     * @param filename     the name of the image/picture, e.g., "ball.gif"
-     * @param scaledWidth  the width of the scaled image (in screen coordinates)
-     * @param scaledHeight the height of the scaled image (in screen coordinates)
-     * @throws IllegalArgumentException if either {@code scaledWidth}
-     *                                  or {@code scaledHeight} is negative
-     * @throws IllegalArgumentException if the image filename is invalid
-     */
-    public static void picture(double x, double y, String filename, double scaledWidth, double scaledHeight) {
-        Image image = getImage(filename);
-        if (scaledWidth < 0) throw new IllegalArgumentException("width  is negative: " + scaledWidth);
-        if (scaledHeight < 0) throw new IllegalArgumentException("height is negative: " + scaledHeight);
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(scaledWidth);
-        double hs = factorY(scaledHeight);
-        if (ws < 0 || hs < 0) throw new IllegalArgumentException("image " + filename + " is corrupt");
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else {
-            offscreen.drawImage(image, (int) Math.round(xs - ws / 2.0),
-                    (int) Math.round(ys - hs / 2.0),
-                    (int) Math.round(ws),
-                    (int) Math.round(hs), null);
-        }
-        draw();
-    }
-
-
-    /**
-     * Draws the specified image centered at (<em>x</em>, <em>y</em>), rotated
-     * given number of degrees, and rescaled to the specified bounding box.
-     * The supported image formats are JPEG, PNG, and GIF.
-     *
-     * @param x            the center <em>x</em>-coordinate of the image
-     * @param y            the center <em>y</em>-coordinate of the image
-     * @param filename     the name of the image/picture, e.g., "ball.gif"
-     * @param scaledWidth  the width of the scaled image (in screen coordinates)
-     * @param scaledHeight the height of the scaled image (in screen coordinates)
-     * @param degrees      is the number of degrees to rotate counterclockwise
-     * @throws IllegalArgumentException if either {@code scaledWidth}
-     *                                  or {@code scaledHeight} is negative
-     * @throws IllegalArgumentException if the image filename is invalid
-     */
-    public static void picture(double x, double y, String filename, double scaledWidth, double scaledHeight, double degrees) {
-        if (scaledWidth < 0) throw new IllegalArgumentException("width is negative: " + scaledWidth);
-        if (scaledHeight < 0) throw new IllegalArgumentException("height is negative: " + scaledHeight);
-        Image image = getImage(filename);
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(scaledWidth);
-        double hs = factorY(scaledHeight);
-        if (ws < 0 || hs < 0) throw new IllegalArgumentException("image " + filename + " is corrupt");
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-
-        offscreen.rotate(Math.toRadians(-degrees), xs, ys);
-        offscreen.drawImage(image, (int) Math.round(xs - ws / 2.0),
-                (int) Math.round(ys - hs / 2.0),
-                (int) Math.round(ws),
-                (int) Math.round(hs), null);
-        offscreen.rotate(Math.toRadians(+degrees), xs, ys);
-
-        draw();
-    }
-
-    /***************************************************************************
-     *  Drawing text.
-     ***************************************************************************/
-
-    /**
-     * Write the given text string in the current font, centered at (<em>x</em>, <em>y</em>).
-     *
-     * @param x    the center <em>x</em>-coordinate of the text
-     * @param y    the center <em>y</em>-coordinate of the text
-     * @param text the text to write
-     */
-    public static void text(double x, double y, String text) {
-        if (text == null) throw new IllegalArgumentException();
-        offscreen.setFont(font);
-        FontMetrics metrics = offscreen.getFontMetrics();
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        int ws = metrics.stringWidth(text);
-        int hs = metrics.getDescent();
-        offscreen.drawString(text, (float) (xs - ws / 2.0), (float) (ys + hs));
-        draw();
-    }
-
-    /**
-     * Write the given text string in the current font, centered at (<em>x</em>, <em>y</em>) and
-     * rotated by the specified number of degrees.
-     *
-     * @param x       the center <em>x</em>-coordinate of the text
-     * @param y       the center <em>y</em>-coordinate of the text
-     * @param text    the text to write
-     * @param degrees is the number of degrees to rotate counterclockwise
-     */
-    public static void text(double x, double y, String text, double degrees) {
-        if (text == null) throw new IllegalArgumentException();
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        offscreen.rotate(Math.toRadians(-degrees), xs, ys);
-        text(x, y, text);
-        offscreen.rotate(Math.toRadians(+degrees), xs, ys);
-    }
-
-
-    /**
-     * Write the given text string in the current font, left-aligned at (<em>x</em>, <em>y</em>).
-     *
-     * @param x    the <em>x</em>-coordinate of the text
-     * @param y    the <em>y</em>-coordinate of the text
-     * @param text the text
-     */
-    public static void textLeft(double x, double y, String text) {
-        if (text == null) throw new IllegalArgumentException();
-        offscreen.setFont(font);
-        FontMetrics metrics = offscreen.getFontMetrics();
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        int hs = metrics.getDescent();
-        offscreen.drawString(text, (float) xs, (float) (ys + hs));
-        draw();
-    }
-
-    /**
-     * Write the given text string in the current font, right-aligned at (<em>x</em>, <em>y</em>).
-     *
-     * @param x    the <em>x</em>-coordinate of the text
-     * @param y    the <em>y</em>-coordinate of the text
-     * @param text the text to write
-     */
-    public static void textRight(double x, double y, String text) {
-        if (text == null) throw new IllegalArgumentException();
-        offscreen.setFont(font);
-        FontMetrics metrics = offscreen.getFontMetrics();
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        int ws = metrics.stringWidth(text);
-        int hs = metrics.getDescent();
-        offscreen.drawString(text, (float) (xs - ws), (float) (ys + hs));
-        draw();
-    }
-
-
-    /**
-     * Copies the offscreen buffer to the onscreen buffer, pauses for t milliseconds
-     * and enables double buffering.
-     *
-     * @param t number of milliseconds
-     * @deprecated replaced by {@link #enableDoubleBuffering()}, {@link #show()}, and {@link #pause(int t)}
-     */
-    @Deprecated
-    public static void show(int t) {
-        show();
-        pause(t);
-        enableDoubleBuffering();
-    }
-
-    /**
-     * Pause for t milliseconds. This method is intended to support computer animations.
-     *
-     * @param t number of milliseconds
-     */
-    public static void pause(int t) {
-        try {
-            Thread.sleep(t);
-        } catch (InterruptedException e) {
-            System.out.println("Error sleeping");
-        }
-    }
-
-    /**
      * Copies offscreen buffer to onscreen buffer. There is no reason to call
      * this method unless double buffering is enabled.
      */
@@ -1145,14 +713,7 @@ public final class StdDrawForSeaBattle implements ActionListener, MouseListener,
             System.out.println("Invalid image file type: " + suffix);
         }
     }
-    /**
-     * Test client.
-     *
-     * @param args the command-line arguments
-     */
-    public static void main(String[] args) {
 
-            }
 
     /**
      * This method cannot be called directly.
@@ -1177,9 +738,7 @@ public final class StdDrawForSeaBattle implements ActionListener, MouseListener,
 
     }
 
-        /**
-         * This method cannot be called directly.
-         */
+
         @Override
         public void mouseEntered (MouseEvent e){
             // this body is intentionally left empty
@@ -1194,13 +753,6 @@ public final class StdDrawForSeaBattle implements ActionListener, MouseListener,
         }
 
 
-        /***************************************************************************
-         *  Keyboard interactions.
-         ***************************************************************************/
-
-        /**
-         * This method cannot be called directly.
-         */
         @Override
         public void mousePressed (MouseEvent e){
 
