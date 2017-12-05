@@ -112,6 +112,11 @@ public class Ship {
         StdDrawForSeaBattle.show();
     }
 
+    public void paint(Graphics g,int x,int y){
+
+
+    }
+
     public static void main(String[] args) {
 
     }

@@ -1,43 +1,64 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 
 public class StartWindow extends JFrame{ //StartWindow is a top-level container
     Container cp;
     JPanel helpPanel;
 
+    Ship currentShip=new Ship(true,1,1,1);
+    Graphics gg;
+
+
     public StartWindow(){
         cp=getContentPane(); //top-level container
         cp.setLayout(new BorderLayout()); //default arrange components
         helpPanel=new JPanel();
-        helpPanel.setPreferredSize(new Dimension(800,100));
+        helpPanel.setPreferredSize(new Dimension(1000,100));
         helpPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
         setTitle("Sea Battle");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //stop execute code when user close frame window; without this app would be still running;
         setJMenuBar(createMenuBar());
         cp.add(helpPanel,BorderLayout.NORTH);
-        cp.add(new LeftPanel(),BorderLayout.WEST);
-        cp.add(new LeftPanel(),BorderLayout.EAST);
+        cp.add(new MyPanel(),BorderLayout.WEST);
         pack();
         setVisible(true);
     }
 
-    public class LeftPanel extends JPanel{
+    public class MyPanel extends JPanel{
+        int newX;
+        int newY;
 
-        public void paintComponent(Graphics g){
-            super.paintComponent(g);
-            g.drawString("This is left Panel!",10,20);
+        public MyPanel(){
             setBorder(BorderFactory.createLineBorder(Color.black));
+            setBackground(Color.WHITE);
+            setBounds(10,10,300,300);
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    newX=e.getX();
+                    newY=e.getY();
+                    repaint(newX,newY,50,50);
+                }
+            });
+        }
+
+        @Override
+        protected void paintComponent(Graphics g){
+            super.paintComponent(g);
+            g.drawOval(newX,newY,50,50);
         }
 
         @Override
         public Dimension getPreferredSize() {
             return new Dimension(400,400);
         }
+
+
     }
+
+
 
     public JPanel chooseGameMode(){
         JPanel panel=new JPanel();
@@ -130,6 +151,7 @@ public class StartWindow extends JFrame{ //StartWindow is a top-level container
                 new StartWindow();  // Let the constructor do the job
             }
         });
+
     }
 
 }
