@@ -1,10 +1,4 @@
-import java.awt.*;
-
 public class PlayerShipBoard extends ShipBoard{
-
-    public PlayerShipBoard() {
-        this.leftCornerX=0;
-    }
 
     //just for computer needs
     public void playerGetPseudoShot(int n){

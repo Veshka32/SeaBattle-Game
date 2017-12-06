@@ -6,7 +6,6 @@ public class ShipBoard implements Drawable{
     int[] field = new int[101]; //0 - unchecked cell, >0 - cell occupied with ship, -1 - checked
     private final int totalShipsLength = 20;
     int numberOfDestroyedCells = 0;
-    int leftCornerX=11;
     Ship[] ships = new Ship[11];
 
     public ShipBoard() {    }
@@ -24,7 +23,7 @@ public class ShipBoard implements Drawable{
         }
     }
 
-    //get shoot from player
+    //get shoot from opponent
     public int getShot(int n) {//-1 for miss, 0 for shot, id if completely destroyed
         int id = field[n];
         field[n] = -1;
@@ -54,7 +53,7 @@ public class ShipBoard implements Drawable{
             g.setColor(Color.BLACK);
             ((Graphics2D)g).setStroke(new BasicStroke(5.0f));
             g.drawOval(getX(n)+12,getY(n)+12,24,24);
-        };
+        }
     }
 
     public Ship getDestroyedShip(int id){
@@ -140,10 +139,10 @@ public class ShipBoard implements Drawable{
         //get random start for ship
         int start = getValidShipStart(size, orient, forRandomPick);
         //build ship
-        ships[id] = new Ship(orient, start, size, leftCornerX);
+        ships[id] = new Ship(orient, start, size);
         while (!isShipValid(ships[id], used)) {
             start = getValidShipStart(size, orient, forRandomPick);
-            ships[id] = new Ship(orient, start, size, leftCornerX);
+            ships[id] = new Ship(orient, start, size);
         }
         //if (leftCornerX == 0) ships[id].draw();
 

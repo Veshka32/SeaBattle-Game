@@ -1,5 +1,4 @@
 import edu.princeton.cs.algs4.Bag;
-import edu.princeton.cs.algs4.Draw;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,8 +8,6 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
     Container cp;
     JPanel helpPanel;
     JLabel message = new JLabel();
-    JLabel playerDestroyed;
-    int playerDestroyedSoFar=0;
     MyPanel leftBoard = new MyPanel();
     MyPanel rightBoard = new MyPanel();
     State state;
@@ -98,7 +95,6 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         revalidate();
     }
 
-
     public void chooseGameMode() {
         JLabel label = new JLabel("Choose method for ship building", JLabel.CENTER);
         JButton autoBuildButton = new JButton("Auto");
@@ -155,16 +151,11 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
     public void startShooting(){
         helpPanel.removeAll();
         message.setText("Player, make a shot!");
-        playerDestroyed=new JLabel();
-        playerDestroyed.setText(""+playerDestroyedSoFar);
         helpPanel.add(message);
-        helpPanel.add(playerDestroyed);
         state=State.MAKE_MOVE;
     }
 
     public void updateNumberOfDestroyed(){
-        playerDestroyedSoFar++;
-        playerDestroyed.setText(""+playerDestroyedSoFar);
         revalidate();
     }
 

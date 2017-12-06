@@ -3,7 +3,7 @@
 public class ShipTest {
     public void ShipIsDestroyed(){
         //arrange
-        Ship ship=new Ship(true,1,3,0);
+        Ship ship=new Ship(true,1,3);
 
         //act
         for (int i = 0; i <3 ; i++) {

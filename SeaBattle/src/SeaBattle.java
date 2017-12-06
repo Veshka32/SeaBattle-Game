@@ -66,6 +66,8 @@ public class SeaBattle implements PlayerAction {
     public void passAction(State s) {
         state = s;
         switch (state) {
+            case NEW_GAME:this.play();
+                break;
             case CHOOSE_ORIENT:
                 break;
             case AUTO_BUILD_SHIPS: {
@@ -110,23 +112,9 @@ public class SeaBattle implements PlayerAction {
             state = State.END;}
     }
 
-
     public void MouseClicked(double x, double y) {
-        if (state == State.END) return;
-        int coordinate;
-        int x1 = (int) x;
-        int y1 = (int) y;
-        if (x1 < 11 && x1 > 0 && y1 > 0 && y1 < 11) isLeftFieldClicked = true;
-        else if (x1 > 11 && x1 < 22 && y1 > 0 && y1 < 11) {
-            isLeftFieldClicked = false;
-            x1 -= 11;
-        } else isLeftFieldClicked = null;
 
-        if (isLeftFieldClicked != null) {
-            y1 = 10 - y1 + 1;
-            coordinate = 10 * (y1 - 1) + x1;
-        } else return; // if user click outside the fields - do nothing
-
+        int coordinate=0;
         if (state == State.BUILD_SHIP) {
             int size = shipsSize[i];
             if (!isLeftFieldClicked) return; // player should build ship only on left field
@@ -134,7 +122,7 @@ public class SeaBattle implements PlayerAction {
                 System.out.println("Invalid cell");
                 return;
             }
-            Ship ship = new Ship(orient, coordinate, size, 0);
+            Ship ship = new Ship(orient, coordinate, size);
             if (!playerBoard.isShipValid(ship, usedCells)) {
                 System.out.println("You may not place ship here"); //if ship invalid, still in state 1;
                 return;
@@ -248,7 +236,7 @@ public class SeaBattle implements PlayerAction {
             }
         }
         int n = forSmartPick.pop();
-        int shot = playerBoard.playerGetShot(n);
+        int shot = playerBoard.getShot(n);
         if (shot >= 0) handleGoodShot(n);
         else gameWindow.drawOnLeft(new ShipBoard.Miss(n));
         gameWindow.updateMessage("Computer shoots to cell " + n);
@@ -276,7 +264,7 @@ public class SeaBattle implements PlayerAction {
         while (playerBoard.isCellChecked(n)) {
             n = getValidRandom(forRandomPick); // catch pseudoshots and shots from smartshot
         }
-        int shot = playerBoard.playerGetShot(n);
+        int shot = playerBoard.getShot(n);
         gameWindow.updateMessage("Computer shoots to cell " + n);
         if (shot >= 0) handleGoodShot(n);
         else gameWindow.drawOnLeft(new ShipBoard.Miss(n));

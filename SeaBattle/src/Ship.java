@@ -11,13 +11,11 @@ import java.util.Scanner;
 public class Ship implements Drawable{
     private final int size;
     private final int start;
-    private final int leftX; // 0 - ship would be drawn on the Player board, 11 - on the opponent (computer) board
     private final boolean orientation; //true - horizontal, false - vertical
     private int damaged = 0; //number of damage shiparts so far; <=size
 
-    public Ship(boolean orientation, int start, int size, int leftX) {
+    public Ship(boolean orientation, int start, int size) {
         this.orientation = orientation;
-        this.leftX = leftX;
         this.start = start;
         this.size = size;
     }
