@@ -9,6 +9,8 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
     Container cp;
     JPanel helpPanel;
     JLabel message = new JLabel();
+    JLabel playerDestroyed;
+    int playerDestroyedSoFar=0;
     MyPanel leftBoard = new MyPanel();
     MyPanel rightBoard = new MyPanel();
     State state;
@@ -21,15 +23,13 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         helpPanel = new JPanel();
         helpPanel.setPreferredSize(new Dimension(1050, 100));
         helpPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-        helpPanel.add(message);
+        helpPanel.add(message,BorderLayout.WEST);
 
         rightBoard.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (state==State.MAKE_MOVE){
                     handler.passCoordinates(e.getX(),e.getY(),State.MAKE_MOVE);
-                    state=State.DO_NOTHING;
-
                 }
                 repaint();
             }
@@ -54,10 +54,12 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
 
     public void updateMessage(String s) {
         message.setText(s);
+        revalidate();
     }
 
     public void updateState(State s){
         state=s;
+        revalidate();
     }
 
     public class MyPanel extends JPanel {
@@ -88,10 +90,12 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
 
     public void drawOnLeft(Drawable object){
         leftBoard.addDrawable(object);
+        revalidate();
     }
 
     public void drawOnRight(Drawable object){
         rightBoard.addDrawable(object);
+        revalidate();
     }
 
 
@@ -102,8 +106,6 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
             @Override
             public void actionPerformed(ActionEvent e) {
                 handler.passAction(State.AUTO_BUILD_SHIPS);
-                //leftBoard.repaint();
-
                 repaint();
                 startShooting();
                 revalidate();
@@ -153,8 +155,17 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
     public void startShooting(){
         helpPanel.removeAll();
         message.setText("Player, make a shot!");
+        playerDestroyed=new JLabel();
+        playerDestroyed.setText(""+playerDestroyedSoFar);
         helpPanel.add(message);
+        helpPanel.add(playerDestroyed);
         state=State.MAKE_MOVE;
+    }
+
+    public void updateNumberOfDestroyed(){
+        playerDestroyedSoFar++;
+        playerDestroyed.setText(""+playerDestroyedSoFar);
+        revalidate();
     }
 
     private JMenuBar createMenuBar() {

@@ -12,8 +12,6 @@ public class ShipBoard implements Drawable{
     public ShipBoard() {    }
 
     public void draw(Graphics g) {
-
-
         g.setColor(Color.BLACK);
         ((Graphics2D)g).setStroke(new BasicStroke(0.0f));
 
@@ -26,53 +24,64 @@ public class ShipBoard implements Drawable{
         }
     }
 
-    //get shoot from opponent
-    public boolean getShot(int n) {
+    //get shoot from player
+    public int getShot(int n) {//-1 for miss, 0 for shot, id if completely destroyed
         int id = field[n];
         field[n] = -1;
         if (id == 0) {
-            drawMiss(n);
-            return false;
+            return -1;
         }
         ships[id].getShot();
         if (ships[id].isDestroyed()) {
-            System.out.println("This ship is DONE");
-            //ships[id].draw();
+            numberOfDestroyedCells++;
+            return id;
         }
-        drawShot(n);
         numberOfDestroyedCells++;
-        return true;
+        return 0;
     }
     //detect end of the game
     public boolean isAllShot() {
         return numberOfDestroyedCells == totalShipsLength;
     }
 
-    public void drawMiss(int n) {
-        StdDrawForSeaBattle.setPenRadius(0.01);
-        StdDrawForSeaBattle.circle((getX(n) + leftCornerX + 0.5), (11 - getY(n) + 0.5), 0.2);
-        StdDrawForSeaBattle.show();
+    static class Miss implements Drawable{
+        int n;
+        public Miss(int n){
+            this.n=n;
+        }
+
+        public void draw(Graphics g){
+            g.setColor(Color.BLACK);
+            ((Graphics2D)g).setStroke(new BasicStroke(5.0f));
+            g.drawOval(getX(n)+12,getY(n)+12,24,24);
+        };
     }
 
-    public void drawShot(int n) {
-        StdDrawForSeaBattle.setPenColor(Color.RED);
-        StdDrawForSeaBattle.setPenRadius(0.01);
-        double xx = getX(n) + 0.5 + leftCornerX;
-        double yy = 11 - getY(n) + 0.5;
-        StdDrawForSeaBattle.line(xx - 0.2, yy - 0.2, xx + 0.2, yy + 0.2);
-        StdDrawForSeaBattle.line(xx - 0.2, yy + 0.2, xx + 0.2, yy - 0.2);
-        StdDrawForSeaBattle.show();
-        StdDrawForSeaBattle.setPenColor();
+    public Ship getDestroyedShip(int id){
+        return ships[id];
     }
 
-    public int getX(int n) {
-        if (n % 10 == 0) return 10;
-        else return n % 10;
+    static class Shot implements Drawable{
+        int n;
+        public Shot(int n){
+            this.n=n;
+        }
+        @Override
+        public void draw(Graphics g) {
+            g.setColor(Color.RED);
+            ((Graphics2D)g).setStroke(new BasicStroke(5.0f));
+            g.fillOval(getX(n)+12,getY(n)+12,24,24);
+        }
     }
 
-    public int getY(int n) {
-        if (n % 10 == 0) return n / 10;
-        else return n / 10 + 1;
+    public static int getX(int n) {
+        if (n % 10 == 0) return 9*50;
+        else return (n % 10-1)*50;
+    }
+
+    public static int getY(int n) {
+        if (n % 10 == 0) return (n / 10-1)*50;
+        else return n / 10 *50;
     }
 
     public void autoPlaceShips() {

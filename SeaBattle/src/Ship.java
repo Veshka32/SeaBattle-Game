@@ -22,13 +22,13 @@ public class Ship implements Drawable{
         this.size = size;
     }
 
-    public Ship(boolean orientation,int start, int end){
-        this.orientation=orientation;
-        this.leftX=0;
-        this.start=start;
-        if (orientation) size = end - start + 1;
-        else size = (end - start) / 10 + 1;
-    }
+//    public Ship(boolean orientation,int start, int end){
+//        this.orientation=orientation;
+//        this.leftX=0;
+//        this.start=start;
+//        if (orientation) size = end - start + 1;
+//        else size = (end - start) / 10 + 1;
+//    }
 
     //return cells ship occupies
     public int[] position() {
@@ -84,6 +84,7 @@ public class Ship implements Drawable{
 
     public void draw(Graphics g) {
         ((Graphics2D)g).setStroke(new BasicStroke(5.0f));
+        g.setColor(Color.BLACK);
         int xLeft;
         if (start % 10 == 0) xLeft = (10-1)*50;
         else xLeft = (start % 10-1)*50;

@@ -25,7 +25,7 @@ public class SeaBattle implements PlayerAction {
     private State state;
 
     public SeaBattle() {
-        if (gameWindow!=null) gameWindow.dispose();
+        if (gameWindow != null) gameWindow.dispose();
         System.out.println("New game is created");
         playerBoard = new PlayerShipBoard();
         //playerBoard.drawBoard();
@@ -43,60 +43,72 @@ public class SeaBattle implements PlayerAction {
             forRandomPick[j] = j;
         }
         forRandomPick[0] = 1; //start for random pick
-        gameWindow=new StartWindow();
+        gameWindow = new StartWindow();
         gameWindow.setHandler(this);
         state = State.CHOOSE_MODE;
     }
 
-    public void passCoordinates(int x, int y,State s){
-        state=s;
+    public void passCoordinates(int x, int y, State s) {
+        state = s;
         int xx;
         int yy;
-        switch (state){
-
-            case DO_NOTHING:
-                break;
+        switch (state) {
             case BUILD_SHIP:
-                break;
-            case AUTO_BUILD_SHIPS:
-                break;
-            case MAKE_MOVE: xx=x/10;yy=y/10; processUserMove(xx,yy);
-                break;
-            case CHOOSE_MODE:
-                break;
-            case CHOOSE_ORIENT:
-                break;
-            case NEW_GAME:
-                break;
-            case END:
-                break;
-        }
-    }
-    public void passAction(State s){
-        state=s;
-        switch (state){
-            case DO_NOTHING:
-                break;
-            case BUILD_SHIP:
-                break;
-            case AUTO_BUILD_SHIPS: {playerBoard.autoPlaceShips();for (Ship ship:playerBoard.getAllShips()) {gameWindow.drawOnLeft(ship);}
-                state=State.MAKE_MOVE;}
-
                 break;
             case MAKE_MOVE:
-                break;
-            case CHOOSE_MODE:
-                break;
-            case CHOOSE_ORIENT:
-                break;
-            case NEW_GAME: this.play();
-                break;
-            case END:
+                xx = x / 50 + 1;
+                yy = y / 50 + 1;
+                processUserMove(xx, yy);
                 break;
         }
     }
 
+    public void passAction(State s) {
+        state = s;
+        switch (state) {
+            case CHOOSE_ORIENT:
+                break;
+            case AUTO_BUILD_SHIPS: {
+                playerBoard.autoPlaceShips();
+                for (Ship ship : playerBoard.getAllShips()) {
+                    gameWindow.drawOnLeft(ship);
+                }
+                state = State.MAKE_MOVE;
+            }
+            break;
+        }
+    }
 
+    private void processUserMove(int x, int y) {
+        state = State.DO_NOTHING;
+        int coordinate = (y - 1) * 10 + x;
+        if (computerBoard.isCellChecked(coordinate)) {
+            gameWindow.updateMessage("You already shot this cell. Click another cell");
+            return;
+        }
+        int shot = computerBoard.getShot(coordinate);
+        if (shot<0) {
+            gameWindow.drawOnRight(new ShipBoard.Miss(coordinate));
+            gameWindow.updateMessage("You miss!");
+            computerMove();
+            if (playerBoard.isAllShot()) {
+                gameWindow.updateMessage("Computer wins!");
+                gameWindow.updateState(State.END);
+                state = State.END;
+            }
+            return;
+        }
+
+        if (shot>0){ gameWindow.drawOnRight(computerBoard.getDestroyedShip(shot)); gameWindow.updateMessage("This ship is DONE");}
+        gameWindow.updateNumberOfDestroyed();
+        gameWindow.drawOnRight(new ShipBoard.Shot(coordinate));
+        gameWindow.updateMessage("Nice shot! Player, make next shot! Click cell");
+        gameWindow.updateState(State.MAKE_MOVE);
+        if (computerBoard.isAllShot()) {
+            gameWindow.updateMessage("Player wins!");
+            gameWindow.updateState(State.END);
+            state = State.END;}
+    }
 
 
     public void MouseClicked(double x, double y) {
@@ -142,57 +154,7 @@ public class SeaBattle implements PlayerAction {
         }
     }
 
-    private void processUserMove(int x,int y){
-        state = State.DO_NOTHING;
-        int coordinate=y*10+x;
-       if (computerBoard.isCellChecked(coordinate)) {
-            gameWindow.updateMessage("You already shot this cell. Click another cell");
-            gameWindow.updateState(State.MAKE_MOVE);
-            return;
-        }
-        boolean shot = computerBoard.getShot(coordinate);
-        if (!shot) {
-            gameWindow.updateMessage("You miss!");
-            computerMove();
-            if (playerBoard.isAllShot()) {
-                gameWindow.updateMessage("Computer wins!");
-                gameWindow.updateState(State.END);
-                state = State.END;
-                return;
-            }
-            gameWindow.updateMessage("Nice shot! Player, make shot! Click cell");
-            gameWindow.updateState(State.MAKE_MOVE);
-            return;
-        }
-        if (computerBoard.isAllShot()) {
-            gameWindow.updateMessage("Player wins!");
-            gameWindow.updateState(State.END);
-            state = State.END;
-        }
-    }
 
-//    @Override
-//    public void KeyTyped(char key) {
-//        if (state == State.CHOOSE_MODE) {
-//            if (key == 'a' || key=='A') {
-//                playerBoard.autoPlaceShips();
-//                System.out.println("Player, make shot! Click cell");
-//                state = State.MAKE_MOVE;
-//            } else if (key == 'm' || key=='M') {
-//                buildShip();
-//            } else System.out.println("Wrong input. Type m to place ships manually or a to place ships automatically");
-//        } else if (state == State.CHOOSE_ORIENT) {
-//            if (key == 'v'|| key=='V') {
-//                orient = false;
-//                System.out.println("Click ship start");
-//                state = State.BUILD_SHIP;
-//            } else if (key == 'h' || key=='H') {
-//                orient = true;
-//                System.out.println("Click ship start");
-//                state = State.BUILD_SHIP;
-//            } else System.out.println("Wrong input. Choose orientation of ship. Type h for horizontal, v for vertical");
-//        }
-//    }
 
     private void buildShip() {
         int size = shipsSize[i];
@@ -209,9 +171,7 @@ public class SeaBattle implements PlayerAction {
     public void play() {
         System.out.println("New game is created");
         playerBoard = new PlayerShipBoard();
-        //playerBoard.drawBoard();
         computerBoard = new ShipBoard();
-        //computerBoard.drawBoard();
         computerBoard.autoPlaceShips();
         isLeftFieldClicked = null;
         orient = true;
@@ -224,7 +184,7 @@ public class SeaBattle implements PlayerAction {
             forRandomPick[j] = j;
         }
         forRandomPick[0] = 1; //start for random pick
-        gameWindow=new StartWindow();
+        gameWindow = new StartWindow();
         gameWindow.setHandler(this);
         state = State.CHOOSE_MODE;
     }
@@ -244,20 +204,20 @@ public class SeaBattle implements PlayerAction {
     }
 
     private void computerMove() {
-        state = State.DO_NOTHING;
+        gameWindow.updateState(State.DO_NOTHING);
         int shot;
         if (goodShotsSoFar == 0) shot = computerMakesRandomShot();
         else shot = computerMakesSmartShot();
         while (shot >= 0) {
             if (shot == 0) {
-                System.out.println("Oh! You are shot!");
+                gameWindow.updateMessage("Oh! You are shot!");
                 shot = computerMakesSmartShot();
             } else {
-                System.out.println("One of your ships is completely destroyed!");
+                gameWindow.updateMessage("One of your ships is completely destroyed!");
                 if (playerBoard.isAllShot()) {
                     return;
                 }
-                Ship destroyed = new Ship(orientSoFar, goodShotSoFarMin, goodShotSoFarMax); //constructor for start - end
+                Ship destroyed = playerBoard.getDestroyedShip(shot);
                 for (int n : destroyed.getSurrounded()) {
                     playerBoard.playerGetPseudoShot(n);
                 }
@@ -265,7 +225,7 @@ public class SeaBattle implements PlayerAction {
                 shot = computerMakesRandomShot();
             }
         }
-        state = State.MAKE_MOVE;
+        gameWindow.updateState(State.MAKE_MOVE);
     }
 
     private int computerMakesSmartShot() {
@@ -290,7 +250,8 @@ public class SeaBattle implements PlayerAction {
         int n = forSmartPick.pop();
         int shot = playerBoard.playerGetShot(n);
         if (shot >= 0) handleGoodShot(n);
-        System.out.println("Computer shoots to cell " + n);
+        else gameWindow.drawOnLeft(new ShipBoard.Miss(n));
+        gameWindow.updateMessage("Computer shoots to cell " + n);
         return shot;
     }
 
@@ -316,12 +277,14 @@ public class SeaBattle implements PlayerAction {
             n = getValidRandom(forRandomPick); // catch pseudoshots and shots from smartshot
         }
         int shot = playerBoard.playerGetShot(n);
-        System.out.println("Computer shoots to cell " + n);
+        gameWindow.updateMessage("Computer shoots to cell " + n);
         if (shot >= 0) handleGoodShot(n);
+        else gameWindow.drawOnLeft(new ShipBoard.Miss(n));
         return shot;
     }
 
     private void handleGoodShot(int n) {
+        gameWindow.drawOnLeft(new ShipBoard.Shot(n));
         prev = n;
         goodShotsSoFar++;
         goodShotSoFarMin = Math.min(goodShotSoFarMin, n);
