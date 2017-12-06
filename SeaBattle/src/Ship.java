@@ -8,7 +8,7 @@ import java.util.Scanner;
 /*Create a ship places on ShipBoard for SeaBattle game.
  */
 
-public class Ship {
+public class Ship implements Drawable{
     private final int size;
     private final int start;
     private final int leftX; // 0 - ship would be drawn on the Player board, 11 - on the opponent (computer) board
@@ -82,40 +82,29 @@ public class Ship {
         damaged++;
     }
 
-    public void draw() {
-        StdDrawForSeaBattle.setPenRadius(0.01);
+    public void draw(Graphics g) {
+        ((Graphics2D)g).setStroke(new BasicStroke(5.0f));
         int xLeft;
-        if (start % 10 == 0) xLeft = 10 + leftX;
-        else xLeft = start % 10 + leftX;
+        if (start % 10 == 0) xLeft = (10-1)*50;
+        else xLeft = (start % 10-1)*50;
         int yTop;
-        if (start % 10 == 0) yTop = 12 - start / 10;
-        else yTop = 12 - (start / 10 + 1);
+        if (start % 10 == 0) yTop = (start / 10-1)*50;
+        else yTop = start / 10 *50;
+
         int xRight;
         int yBottom;
         if (!orientation) {
-            xRight = xLeft + 1;
-            yBottom = yTop - size;
+            xRight = xLeft + 50;
+            yBottom = yTop - size*50;
         } else {
-            xRight = xLeft + size;
-            yBottom = yTop - 1;
+            xRight = xLeft + size*50;
+            yBottom = yTop - 1*50;
         }
-        double centerX=(xLeft+xRight)/2.0;
-        double centerY=(yBottom+yTop)/2.0;
-        double halfWidth=(xRight-xLeft)/2.0;
-        double haldHeight=(yTop-yBottom)/2.0;
 
-        StdDrawForSeaBattle.rectangle(centerX,centerY,halfWidth,haldHeight);
-//        StdDrawForSeaBattle.line(xLeft, ybottom, xright, ybottom);
-//        StdDrawForSeaBattle.line(xLeft, ytop, xright, ytop);
-//        StdDrawForSeaBattle.line(xLeft, ybottom, xLeft, ytop);
-//        StdDrawForSeaBattle.line(xright, ybottom, xright, ytop);
-        StdDrawForSeaBattle.show();
-    }
+        int width=(xRight-xLeft);
+        int height=(yTop-yBottom);
+        g.drawRect(xLeft,yTop,width,height);
 
-    public void paint(Graphics g,int x,int y){
-        Graphics2D gg= (Graphics2D) g;
-        gg.setColor(Color.RED);
-        gg.drawRect(x,y,50,50);
     }
 
     public static void main(String[] args) {

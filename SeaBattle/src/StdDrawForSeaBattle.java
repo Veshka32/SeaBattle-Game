@@ -1,26 +1,3 @@
-/******************************************************************************
- *  Compilation:  javac StdDraw.java
- *  Execution:    java StdDraw
- *  Dependencies: none
- *
- *  Standard drawing library. This class provides a basic capability for
- *  creating drawings with your programs. It uses a simple graphics model that
- *  allows you to create drawings consisting of points, lines, and curves
- *  in a window on your computer and to save the drawings to a file.
- *
- *
- *  ----
- *    -  Add support for gradient fill, etc.
- *    -  Fix setCanvasSize() so that it can only be called once.
- *    -  On some systems, drawing a line (or other shape) that extends way
- *       beyond canvas (e.g., to infinity) dimensions does not get drawn.
- *
- *  Remarks
- *  -------
- *    -  don't use AffineTransform for rescaling since it inverts
- *       images and strings
- *
- ******************************************************************************/
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -39,14 +16,8 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
-/**
-
- */
 public final class StdDrawForSeaBattle implements ActionListener, MouseListener, MouseMotionListener, KeyListener {
 
-    /**
-     * The color black.
-     */
     public static final Color BLACK = Color.BLACK;
 
     /**
@@ -733,7 +704,7 @@ public final class StdDrawForSeaBattle implements ActionListener, MouseListener,
         synchronized (mouseLock) {
             mouseX = StdDrawForSeaBattle.userX(e.getX());
             mouseY = StdDrawForSeaBattle.userY(e.getY());
-            handler.MouseClicked(mouseX, mouseY);
+            //handler.MouseClicked(mouseX, mouseY);
         }
 
     }
@@ -788,7 +759,7 @@ public final class StdDrawForSeaBattle implements ActionListener, MouseListener,
     @Override
     public void keyTyped(KeyEvent e) {
         synchronized (keyLock) {
-            handler.KeyTyped(e.getKeyChar());
+
         }
     }
 

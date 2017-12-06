@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class PlayerShipBoard extends ShipBoard {
+public class PlayerShipBoard extends ShipBoard{
 
     public PlayerShipBoard() {
         this.leftCornerX=0;
@@ -35,7 +35,7 @@ public class PlayerShipBoard extends ShipBoard {
 
     //manually place ship
     public void placeShip(Ship ship, int id, boolean[] usedCells) {
-        ship.draw();
+        //ship.draw();
         for (int n : ship.getSurrounded()) {
             usedCells[n] = true;
         }

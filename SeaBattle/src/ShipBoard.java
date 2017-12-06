@@ -1,7 +1,8 @@
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Random;
 
-public class ShipBoard {
+public class ShipBoard implements Drawable{
     int[] field = new int[101]; //0 - unchecked cell, >0 - cell occupied with ship, -1 - checked
     private final int totalShipsLength = 20;
     int numberOfDestroyedCells = 0;
@@ -10,17 +11,18 @@ public class ShipBoard {
 
     public ShipBoard() {    }
 
-    public void drawBoard(Graphics g) {
+    public void draw(Graphics g) {
 
-        Graphics2D gg=(Graphics2D) g;
-        gg.setColor(Color.BLACK);
-        gg.setStroke(new BasicStroke(2.0f));
+
+        g.setColor(Color.BLACK);
+        ((Graphics2D)g).setStroke(new BasicStroke(0.0f));
+
         for (int i = 0; i < 501; i+=50) {
-            gg.drawLine(0, i, 500, i);
+            g.drawLine(0, i, 500, i);
         }
 
         for (int i = 0; i < 501; i+=50) {
-            gg.drawLine(i, 0, i, 500);
+            g.drawLine(i, 0, i, 500);
         }
     }
 
@@ -35,7 +37,7 @@ public class ShipBoard {
         ships[id].getShot();
         if (ships[id].isDestroyed()) {
             System.out.println("This ship is DONE");
-            ships[id].draw();
+            //ships[id].draw();
         }
         drawShot(n);
         numberOfDestroyedCells++;
@@ -84,14 +86,13 @@ public class ShipBoard {
         }
         forRandomPickX[0] = 1; //lower bound for random pick
         forRandomPickY[0] = 1;
-        StdDrawForSeaBattle.setPenRadius(0.01);
         Random random = new Random();
         for (int i = 1; i < shipsSize.length; i++) {
             boolean choice = random.nextBoolean();
             if (choice) autoBuildShip(shipsSize[i], i, true, forRandomPickX, used);
             else autoBuildShip(shipsSize[i], i, false, forRandomPickY, used);
         }
-        StdDrawForSeaBattle.show();
+        System.out.println("Done!");
     }
 
     public int getRandom(int from, int to) {
@@ -135,13 +136,19 @@ public class ShipBoard {
             start = getValidShipStart(size, orient, forRandomPick);
             ships[id] = new Ship(orient, start, size, leftCornerX);
         }
-        if (leftCornerX == 0) ships[id].draw();
+        //if (leftCornerX == 0) ships[id].draw();
 
         //update usedCells
         for (int n : ships[id].getSurrounded()) {
             used[n] = true;
         }
         for (int n : ships[id].position()) field[n] = id; //
+    }
+
+    public Ship[] getAllShips(){
+        Ship[] allShips=new Ship[10];
+        System.arraycopy(ships,1,allShips,0,10);
+        return allShips;
     }
 
     public boolean isShipValid(Ship ship, boolean[] usedCells) {

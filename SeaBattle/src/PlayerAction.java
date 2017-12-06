@@ -1,4 +1,5 @@
 public interface PlayerAction{
-    void MouseClicked(double x, double y);
-    void KeyTyped(char key);
+
+    void passCoordinates(int x, int y,State s);
+    void passAction(State state);
 }
