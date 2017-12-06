@@ -139,9 +139,9 @@ public class SeaBattle implements PlayerAction {
 
     public void play() {
         playerBoard = new PlayerShipBoard();
-        playerBoard.drawBoard();
+        //playerBoard.drawBoard();
         computerBoard = new ShipBoard();
-        computerBoard.drawBoard();
+        //computerBoard.drawBoard();
         computerBoard.autoPlaceShips();
         isLeftFieldClicked = null;
         orient = true;

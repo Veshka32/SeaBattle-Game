@@ -1,4 +1,4 @@
-import java.awt.Color;
+import java.awt.*;
 import java.util.Random;
 
 public class ShipBoard {
@@ -10,16 +10,18 @@ public class ShipBoard {
 
     public ShipBoard() {    }
 
-    public void drawBoard() {
-        StdDrawForSeaBattle.setPenColor();
-        StdDrawForSeaBattle.setPenRadius();
-        for (int i = leftCornerX + 1; i < leftCornerX + 12; i++) {
-            StdDrawForSeaBattle.line(i, 1, i, 11);
+    public void drawBoard(Graphics g) {
+
+        Graphics2D gg=(Graphics2D) g;
+        gg.setColor(Color.BLACK);
+        gg.setStroke(new BasicStroke(2.0f));
+        for (int i = 0; i < 501; i+=50) {
+            gg.drawLine(0, i, 500, i);
         }
-        for (int i = 1; i < 12; i++) {
-            StdDrawForSeaBattle.line(leftCornerX + 1, i, 10 + leftCornerX + 1, i);
+
+        for (int i = 0; i < 501; i+=50) {
+            gg.drawLine(i, 0, i, 500);
         }
-        StdDrawForSeaBattle.show();
     }
 
     //get shoot from opponent

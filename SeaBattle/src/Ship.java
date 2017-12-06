@@ -113,8 +113,9 @@ public class Ship {
     }
 
     public void paint(Graphics g,int x,int y){
-
-
+        Graphics2D gg= (Graphics2D) g;
+        gg.setColor(Color.RED);
+        gg.drawRect(x,y,50,50);
     }
 
     public static void main(String[] args) {

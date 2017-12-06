@@ -5,23 +5,29 @@ import java.awt.event.*;
 public class StartWindow extends JFrame{ //StartWindow is a top-level container
     Container cp;
     JPanel helpPanel;
+    MyPanel leftBoard=new MyPanel();
+    MyPanel rightBoard=new MyPanel();
+    int state=0;
+    Rectangle clipArea;
 
     Ship currentShip=new Ship(true,1,1,1);
-    Graphics gg;
+    ShipBoard shipBoard=new ShipBoard();
 
 
     public StartWindow(){
         cp=getContentPane(); //top-level container
         cp.setLayout(new BorderLayout()); //default arrange components
         helpPanel=new JPanel();
-        helpPanel.setPreferredSize(new Dimension(1000,100));
+        helpPanel.setPreferredSize(new Dimension(1050,100));
         helpPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
         setTitle("Sea Battle");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //stop execute code when user close frame window; without this app would be still running;
         setJMenuBar(createMenuBar());
         cp.add(helpPanel,BorderLayout.NORTH);
-        cp.add(new MyPanel(),BorderLayout.WEST);
+        leftBoard.setDoubleBuffered(true);
+        cp.add(leftBoard,BorderLayout.WEST);
+        cp.add(rightBoard,BorderLayout.EAST);
         pack();
         setVisible(true);
     }
@@ -33,13 +39,13 @@ public class StartWindow extends JFrame{ //StartWindow is a top-level container
         public MyPanel(){
             setBorder(BorderFactory.createLineBorder(Color.black));
             setBackground(Color.WHITE);
-            setBounds(10,10,300,300);
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
+                    state=0;
                     newX=e.getX();
                     newY=e.getY();
-                    repaint(newX,newY,50,50);
+                    repaint(newX,newY,51,51);
                 }
             });
         }
@@ -47,12 +53,14 @@ public class StartWindow extends JFrame{ //StartWindow is a top-level container
         @Override
         protected void paintComponent(Graphics g){
             super.paintComponent(g);
-            g.drawOval(newX,newY,50,50);
+            shipBoard.drawBoard(g);
+            if (state==0) currentShip.paint(g,newX,newY);
+
         }
 
         @Override
         public Dimension getPreferredSize() {
-            return new Dimension(400,400);
+            return new Dimension(500,500);
         }
 
 
