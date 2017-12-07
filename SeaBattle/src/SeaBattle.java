@@ -6,7 +6,6 @@ public class SeaBattle implements PlayerAction {
     private final int[] shipsSize = {0, 4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
     private PlayerShipBoard playerBoard;
     private ShipBoard computerBoard;
-    private Boolean isLeftFieldClicked;
     private boolean orient;
     private boolean[] usedCells; //for Player
     private int[] forRandomPick; //for computer
@@ -20,32 +19,10 @@ public class SeaBattle implements PlayerAction {
     private int goodShotSoFarMax = 0;
     private boolean orientSoFar;
     private int prev;
-
-    //current game state
-    private State state;
+    private State state; //current game state
 
     public SeaBattle() {
-        if (gameWindow != null) gameWindow.dispose();
-        System.out.println("New game is created");
-        playerBoard = new PlayerShipBoard();
-        //playerBoard.drawBoard();
-        computerBoard = new ShipBoard();
-        //computerBoard.drawBoard();
-        computerBoard.autoPlaceShips();
-        isLeftFieldClicked = null;
-        orient = true;
-        usedCells = new boolean[101];
-        i = 1;
-        state = State.DO_NOTHING;
-        resetSmartFields();
-        forRandomPick = new int[101];
-        for (int j = 1; j < forRandomPick.length; j++) {
-            forRandomPick[j] = j;
-        }
-        forRandomPick[0] = 1; //start for random pick
-        gameWindow = new StartWindow();
-        gameWindow.setHandler(this);
-        state = State.CHOOSE_MODE;
+        play();
     }
 
     public void passCoordinates(int x, int y, State s) {
@@ -102,7 +79,6 @@ public class SeaBattle implements PlayerAction {
         }
 
         if (shot>0){ gameWindow.drawOnRight(computerBoard.getDestroyedShip(shot)); gameWindow.updateMessage("This ship is DONE");}
-        gameWindow.updateNumberOfDestroyed();
         gameWindow.drawOnRight(new ShipBoard.Shot(coordinate));
         gameWindow.updateMessage("Nice shot! Player, make next shot! Click cell");
         gameWindow.updateState(State.MAKE_MOVE);
@@ -117,7 +93,6 @@ public class SeaBattle implements PlayerAction {
         int coordinate=0;
         if (state == State.BUILD_SHIP) {
             int size = shipsSize[i];
-            if (!isLeftFieldClicked) return; // player should build ship only on left field
             if (!isValidClickForBuildShip(coordinate, size, orient)) {
                 System.out.println("Invalid cell");
                 return;
@@ -142,8 +117,6 @@ public class SeaBattle implements PlayerAction {
         }
     }
 
-
-
     private void buildShip() {
         int size = shipsSize[i];
         System.out.println("Build ship of length " + size);
@@ -157,24 +130,22 @@ public class SeaBattle implements PlayerAction {
     }
 
     public void play() {
+        if (gameWindow==null) {gameWindow=new StartWindow(); gameWindow.setHandler(this);}
         System.out.println("New game is created");
         playerBoard = new PlayerShipBoard();
         computerBoard = new ShipBoard();
         computerBoard.autoPlaceShips();
-        isLeftFieldClicked = null;
         orient = true;
         usedCells = new boolean[101];
         i = 1;
-        state = State.DO_NOTHING;
+
         resetSmartFields();
         forRandomPick = new int[101];
         for (int j = 1; j < forRandomPick.length; j++) {
             forRandomPick[j] = j;
         }
         forRandomPick[0] = 1; //start for random pick
-        gameWindow = new StartWindow();
-        gameWindow.setHandler(this);
-        state = State.CHOOSE_MODE;
+        state = State.DO_NOTHING;
     }
 
     private boolean isValidClickForBuildShip(int start, int size, boolean orient) {
@@ -251,7 +222,6 @@ public class SeaBattle implements PlayerAction {
         prev = -1;
     }
 
-
     private int getValidRandom(int[] forRandomPick) {
         int position = computerBoard.getRandom(forRandomPick[0], 101);
         int validRandom = forRandomPick[position];
@@ -262,7 +232,7 @@ public class SeaBattle implements PlayerAction {
     private int computerMakesRandomShot() {
         int n = getValidRandom(forRandomPick);
         while (playerBoard.isCellChecked(n)) {
-            n = getValidRandom(forRandomPick); // catch pseudoshots and shots from smartshot
+            n = getValidRandom(forRandomPick); // catch pseudoShots and shots from smartShot
         }
         int shot = playerBoard.getShot(n);
         gameWindow.updateMessage("Computer shoots to cell " + n);

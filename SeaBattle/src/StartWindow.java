@@ -6,7 +6,7 @@ import java.awt.event.*;
 
 public class StartWindow extends JFrame { //StartWindow is a top-level container
     Container cp;
-    JPanel helpPanel;
+    JPanel helpPanel=helpPanel = new JPanel();
     JLabel message = new JLabel();
     MyPanel leftBoard = new MyPanel();
     MyPanel rightBoard = new MyPanel();
@@ -17,11 +17,9 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         cp = getContentPane(); //top-level container
         cp.setLayout(new BorderLayout()); //default arrange components
         //set helpPanel
-        helpPanel = new JPanel();
         helpPanel.setPreferredSize(new Dimension(1050, 100));
         helpPanel.setBorder(BorderFactory.createLineBorder(Color.black));
         helpPanel.add(message,BorderLayout.WEST);
-
         rightBoard.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -34,11 +32,12 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         chooseGameMode(); //add panel to JFrame to the north
         leftBoard.addDrawable(new ShipBoard());
         rightBoard.addDrawable(new ShipBoard());
-        setJMenuBar(createMenuBar());
 
+        setJMenuBar(createMenuBar());
         cp.add(helpPanel, BorderLayout.NORTH);
         cp.add(leftBoard, BorderLayout.WEST);
         cp.add(rightBoard, BorderLayout.EAST);
+        setResizable(false);
         setTitle("Sea Battle");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //stop execute code when user close frame window; without this app would be still running;
         pack();
@@ -47,6 +46,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
 
     public void setHandler(PlayerAction p) {
         handler = p;
+        revalidate();
     }
 
     public void updateMessage(String s) {
@@ -79,10 +79,25 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
             objectsForDraw.add(d);
         }
 
+        public void eraseAll(){
+            objectsForDraw=new Bag<>();
+        }
+
         @Override
         public Dimension getPreferredSize() {
             return new Dimension(500, 500);
         }
+    }
+
+    public void refresh(){
+        leftBoard.eraseAll();
+        leftBoard.addDrawable(new ShipBoard());
+        rightBoard.eraseAll();
+        rightBoard.addDrawable(new ShipBoard());
+        helpPanel.removeAll();
+        chooseGameMode();
+        repaint();
+        revalidate();
     }
 
     public void drawOnLeft(Drawable object){
@@ -155,24 +170,21 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         state=State.MAKE_MOVE;
     }
 
-    public void updateNumberOfDestroyed(){
-        revalidate();
-    }
-
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("File");
         menuBar.add(menu);
         JMenuItem newGame = new JMenuItem("New game");
-        JMenuItem exit = new JMenuItem("Exit");
+
         newGame.addActionListener(new ActionListener() { //anonymous inner class to implement methos specific to this source
             @Override
             public void actionPerformed(ActionEvent e) {
                 handler.passAction(State.NEW_GAME);
-                dispose(); //new JFrame will be created in SeaBattle
+                refresh();
             }
         });
 
+        JMenuItem exit = new JMenuItem("Exit");
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -183,6 +195,9 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         menu.add(exit);
         return menuBar;
     }
+
+
+
 
     public static void main(String[] args) {
         //To run the constructor on the event-dispatching thread,

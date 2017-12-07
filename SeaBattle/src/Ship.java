@@ -20,14 +20,6 @@ public class Ship implements Drawable{
         this.size = size;
     }
 
-//    public Ship(boolean orientation,int start, int end){
-//        this.orientation=orientation;
-//        this.leftX=0;
-//        this.start=start;
-//        if (orientation) size = end - start + 1;
-//        else size = (end - start) / 10 + 1;
-//    }
-
     //return cells ship occupies
     public int[] position() {
         if (size == 1) return new int[]{start};
