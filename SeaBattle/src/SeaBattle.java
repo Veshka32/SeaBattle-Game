@@ -13,7 +13,7 @@ public class SeaBattle implements PlayerAction {
     private boolean[] usedCells; //for Player
     private int[] forRandomPick; //for computer
     private ArrayList<Integer> forPreferredPick=new ArrayList<>();
-    private int i; // current index in shipsSize
+    private int i; // current index in shipsSize 
     private StartWindow gameWindow;
 
     //for computer SmartMove
