@@ -6,8 +6,10 @@ import java.awt.event.*;
 
 public class StartWindow extends JFrame { //StartWindow is a top-level container
     Container cp;
-    JPanel helpPanel=helpPanel = new JPanel();
-    JLabel message = new JLabel();
+    JPanel messagePanel = new JPanel(new BorderLayout());
+    JPanel buttonPanel = new JPanel();
+    JLabel message = new JLabel("Welcome to SeaBattle");
+    JLabel message1 = new JLabel("Message 1");
     MyPanel leftBoard = new MyPanel();
     MyPanel rightBoard = new MyPanel();
     State state;
@@ -16,31 +18,44 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
     public StartWindow() {
         cp = getContentPane(); //top-level container
         cp.setLayout(new BorderLayout()); //default arrange components
-        //set helpPanel
-        helpPanel.setPreferredSize(new Dimension(1050, 100));
-        helpPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-        helpPanel.add(message,BorderLayout.WEST);
+        //set messagePanel
+        messagePanel.setPreferredSize(new Dimension(1050, 100));
+        messagePanel.setBorder(BorderFactory.createLineBorder(Color.black));
+        messagePanel.add(message, BorderLayout.NORTH);
+        messagePanel.add(message1, BorderLayout.CENTER);
         rightBoard.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (state==State.MAKE_MOVE){
-                    handler.passCoordinates(e.getX(),e.getY(),State.MAKE_MOVE);
-                }
+                if (state == State.MAKE_MOVE)
+                    handler.passCoordinates(e.getX(), e.getY(), State.MAKE_MOVE);
                 repaint();
             }
         });
-        chooseGameMode(); //add panel to JFrame to the north
+
+        leftBoard.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (state == State.BUILD_HORIZONTAL_SHIP || state == State.BUILD_VERTICAL_SHIP) {
+                    handler.passCoordinates(e.getX(), e.getY(), state);
+                    repaint();
+                    state = State.CHOOSE_ORIENT;
+                    handler.passAction(State.CHOOSE_ORIENT);
+                }
+            }
+        });
+
         leftBoard.addDrawable(new ShipBoard());
         rightBoard.addDrawable(new ShipBoard());
 
         setJMenuBar(createMenuBar());
-        cp.add(helpPanel, BorderLayout.NORTH);
+        cp.add(messagePanel, BorderLayout.NORTH);
+        chooseGameMode();
         cp.add(leftBoard, BorderLayout.WEST);
         cp.add(rightBoard, BorderLayout.EAST);
         setResizable(false);
         setTitle("Sea Battle");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //stop execute code when user close frame window; without this app would be still running;
-        pack();
+        pack(); //organize panels, sizes
         setVisible(true);
     }
 
@@ -49,18 +64,19 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         revalidate();
     }
 
-    public void updateMessage(String s) {
-        message.setText(s);
+    public void updateMessage(String s, String s1) {
+        if (!s.equals("")) message.setText(s);
+        if (!s1.equals("")) message1.setText(s1);
         revalidate();
     }
 
-    public void updateState(State s){
-        state=s;
+    public void updateState(State s) {
+        state = s;
         revalidate();
     }
 
     public class MyPanel extends JPanel {
-        public Bag<Drawable> objectsForDraw=new Bag<>();
+        public Bag<Drawable> objectsForDraw = new Bag<>();
 
         public MyPanel() {
             setBorder(BorderFactory.createLineBorder(Color.black));
@@ -70,17 +86,17 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
-            for (Drawable d:objectsForDraw){
+            for (Drawable d : objectsForDraw) {
                 d.draw(g);
             }
         }
 
-        public void addDrawable(Drawable d){
+        public void addDrawable(Drawable d) {
             objectsForDraw.add(d);
         }
 
-        public void eraseAll(){
-            objectsForDraw=new Bag<>();
+        public void eraseAll() {
+            objectsForDraw = new Bag<>();
         }
 
         @Override
@@ -89,29 +105,28 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         }
     }
 
-    public void refresh(){
+    public void refresh() {
         leftBoard.eraseAll();
         leftBoard.addDrawable(new ShipBoard());
         rightBoard.eraseAll();
         rightBoard.addDrawable(new ShipBoard());
-        helpPanel.removeAll();
         chooseGameMode();
         repaint();
         revalidate();
     }
 
-    public void drawOnLeft(Drawable object){
+    public void drawOnLeft(Drawable object) {
         leftBoard.addDrawable(object);
         revalidate();
     }
 
-    public void drawOnRight(Drawable object){
+    public void drawOnRight(Drawable object) {
         rightBoard.addDrawable(object);
         revalidate();
     }
 
     public void chooseGameMode() {
-        JLabel label = new JLabel("Choose method for ship building", JLabel.CENTER);
+        messagePanel.removeAll();
         JButton autoBuildButton = new JButton("Auto");
         autoBuildButton.addActionListener(new ActionListener() {
             @Override
@@ -127,47 +142,53 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         manuallyBuildButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                helpPanel.removeAll();
-                chooseOrientation();
+                handler.passAction(State.CHOOSE_ORIENT);
                 revalidate();
                 repaint();
             }
         });
-        helpPanel.add(label);
-        helpPanel.add(autoBuildButton);
-        helpPanel.add(manuallyBuildButton);
+        buttonPanel = new JPanel();
+        buttonPanel.add(autoBuildButton);
+        buttonPanel.add(manuallyBuildButton);
+
+        message.setText("Welcome to SeaBattle");
+        message1.setText("Choose method for ship building");
+        messagePanel.add(buttonPanel, BorderLayout.SOUTH);
+        messagePanel.add(message, BorderLayout.NORTH);
+        messagePanel.add(message1, BorderLayout.CENTER);
     }
 
-    private void chooseOrientation() {
-        JLabel label = new JLabel("Choose orientation of ship", JLabel.CENTER);
+    public void chooseOrientation() {
+        state = State.DO_NOTHING;
+        message1.setText("Choose orientation of ship");
+        buttonPanel.removeAll();
         JButton horizontal = new JButton("Horizontal");
         horizontal.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                handler.passAction(State.BUILD_SHIP);
-                revalidate();
-                repaint();
+                message1.setText("Build horizontal ship");
+                buttonPanel.removeAll();
+                state = State.BUILD_HORIZONTAL_SHIP;
             }
         });
         JButton vertical = new JButton("Vertical");
         vertical.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                handler.passAction(State.BUILD_SHIP);
-                revalidate();
-                repaint();
+                message1.setText("Build vertical ship");
+                buttonPanel.removeAll();
+                state = State.BUILD_VERTICAL_SHIP;
             }
         });
-        helpPanel.add(label);
-        helpPanel.add(horizontal);
-        helpPanel.add(vertical);
+        buttonPanel.add(horizontal);
+        buttonPanel.add(vertical);
     }
 
-    public void startShooting(){
-        helpPanel.removeAll();
-        message.setText("Player, make a shot!");
-        helpPanel.add(message);
-        state=State.MAKE_MOVE;
+    public void startShooting() {
+        messagePanel.remove(buttonPanel);
+        message.setText("Done!");
+        message1.setText("Player, make a shot");
+        state = State.MAKE_MOVE;
     }
 
     private JMenuBar createMenuBar() {
@@ -196,9 +217,6 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         return menuBar;
     }
 
-
-
-
     public static void main(String[] args) {
         //To run the constructor on the event-dispatching thread,
         SwingUtilities.invokeLater(new Runnable() {
@@ -207,7 +225,6 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
                 new StartWindow();  // Let the constructor do the job
             }
         });
-
     }
 
 }

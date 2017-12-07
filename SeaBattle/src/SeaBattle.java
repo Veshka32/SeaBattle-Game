@@ -6,7 +6,6 @@ public class SeaBattle implements PlayerAction {
     private final int[] shipsSize = {0, 4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
     private PlayerShipBoard playerBoard;
     private ShipBoard computerBoard;
-    private boolean orient;
     private boolean[] usedCells; //for Player
     private int[] forRandomPick; //for computer
     private int i; // current index in shipsSize
@@ -27,14 +26,16 @@ public class SeaBattle implements PlayerAction {
 
     public void passCoordinates(int x, int y, State s) {
         state = s;
-        int xx;
-        int yy;
+        int xx = x / 50 + 1;
+        int yy = y / 50 + 1;
         switch (state) {
-            case BUILD_SHIP:
+            case BUILD_HORIZONTAL_SHIP:
+                buildShip(xx, yy, true);
+                break;
+            case BUILD_VERTICAL_SHIP:
+                buildShip(xx, yy, false);
                 break;
             case MAKE_MOVE:
-                xx = x / 50 + 1;
-                yy = y / 50 + 1;
                 processUserMove(xx, yy);
                 break;
         }
@@ -43,9 +44,18 @@ public class SeaBattle implements PlayerAction {
     public void passAction(State s) {
         state = s;
         switch (state) {
-            case NEW_GAME:this.play();
+            case NEW_GAME:
+                this.play();
                 break;
             case CHOOSE_ORIENT:
+                if (i == shipsSize.length) gameWindow.startShooting();
+                else {
+                    gameWindow.updateMessage("Build ship of length " + shipsSize[i], "");
+                    if (shipsSize[i] == 1) {
+                        gameWindow.updateMessage("", " ");
+                        gameWindow.updateState(State.BUILD_HORIZONTAL_SHIP);
+                    } else gameWindow.chooseOrientation();
+                }
                 break;
             case AUTO_BUILD_SHIPS: {
                 playerBoard.autoPlaceShips();
@@ -62,80 +72,60 @@ public class SeaBattle implements PlayerAction {
         state = State.DO_NOTHING;
         int coordinate = (y - 1) * 10 + x;
         if (computerBoard.isCellChecked(coordinate)) {
-            gameWindow.updateMessage("You already shot this cell. Click another cell");
+            gameWindow.updateMessage("You already shot this cell. Click another cell", "");
             return;
         }
         int shot = computerBoard.getShot(coordinate);
-        if (shot<0) {
+        if (shot < 0) {
             gameWindow.drawOnRight(new ShipBoard.Miss(coordinate));
-            gameWindow.updateMessage("You miss!");
+            gameWindow.updateMessage("", "You miss!");
             computerMove();
             if (playerBoard.isAllShot()) {
-                gameWindow.updateMessage("Computer wins!");
+                gameWindow.updateMessage("GAME OVER", "Computer wins!");
                 gameWindow.updateState(State.END);
                 state = State.END;
             }
             return;
         }
 
-        if (shot>0){ gameWindow.drawOnRight(computerBoard.getDestroyedShip(shot)); gameWindow.updateMessage("This ship is DONE");}
+        if (shot > 0) {
+            gameWindow.drawOnRight(computerBoard.getDestroyedShip(shot));
+            gameWindow.updateMessage("", "This ship is DONE");
+        }
         gameWindow.drawOnRight(new ShipBoard.Shot(coordinate));
-        gameWindow.updateMessage("Nice shot! Player, make next shot! Click cell");
+        gameWindow.updateMessage("Nice shot!", "Player, make next shot");
         gameWindow.updateState(State.MAKE_MOVE);
         if (computerBoard.isAllShot()) {
-            gameWindow.updateMessage("Player wins!");
+            gameWindow.updateMessage("GAME OVER", "Player wins!");
             gameWindow.updateState(State.END);
-            state = State.END;}
-    }
-
-    public void MouseClicked(double x, double y) {
-
-        int coordinate=0;
-        if (state == State.BUILD_SHIP) {
-            int size = shipsSize[i];
-            if (!isValidClickForBuildShip(coordinate, size, orient)) {
-                System.out.println("Invalid cell");
-                return;
-            }
-            Ship ship = new Ship(orient, coordinate, size);
-            if (!playerBoard.isShipValid(ship, usedCells)) {
-                System.out.println("You may not place ship here"); //if ship invalid, still in state 1;
-                return;
-            }
-            state = State.DO_NOTHING;
-            playerBoard.placeShip(ship, i, usedCells);
-            System.out.println("Ship is built!");
-            i++;
-            if (i == shipsSize.length) { // end of building ships
-                state = State.DO_NOTHING;
-                System.out.println("Done!");
-                System.out.println("Player, make shot! Click cell");
-                state = State.MAKE_MOVE;
-                return;
-            }
-            buildShip();
+            state = State.END;
         }
     }
 
-    private void buildShip() {
+    public void buildShip(int x, int y, boolean orientation) {
+        int coordinate = (y - 1) * 10 + x;
         int size = shipsSize[i];
-        System.out.println("Build ship of length " + size);
-        if (size > 1) {
-            System.out.println("Choose orientation of ship. Type h for horizontal, v for vertical");
-            state = State.CHOOSE_ORIENT;
-        } else {
-            System.out.println("Click ship start");
-            state = State.BUILD_SHIP;
+        Ship ship = new Ship(orientation, coordinate, size);
+        if (!playerBoard.isShipValid(ship, usedCells) || !isValidClickForBuildShip(coordinate, size, orientation)) {
+            gameWindow.updateMessage("You may not place ship here", "");
+            gameWindow.chooseOrientation();
+            return;
         }
+        state = State.DO_NOTHING;
+        playerBoard.placeShip(ship, i, usedCells);
+        gameWindow.drawOnLeft(ship);
+        i++;
+
     }
 
     public void play() {
-        if (gameWindow==null) {gameWindow=new StartWindow(); gameWindow.setHandler(this);}
-        System.out.println("New game is created");
+        if (gameWindow == null) {
+            gameWindow = new StartWindow();
+            gameWindow.setHandler(this);
+        }
         playerBoard = new PlayerShipBoard();
         computerBoard = new ShipBoard();
         computerBoard.autoPlaceShips();
-        orient = true;
         usedCells = new boolean[101];
         i = 1;
 
@@ -149,7 +139,6 @@ public class SeaBattle implements PlayerAction {
     }
 
     private boolean isValidClickForBuildShip(int start, int size, boolean orient) {
-        if (start < 1 || start > 100) return false;
         int distToEdge;
         if (orient) {
             distToEdge = 10 - start % 10;
@@ -169,10 +158,10 @@ public class SeaBattle implements PlayerAction {
         else shot = computerMakesSmartShot();
         while (shot >= 0) {
             if (shot == 0) {
-                gameWindow.updateMessage("Oh! You are shot!");
+                gameWindow.updateMessage("", "Oh! You are shot!");
                 shot = computerMakesSmartShot();
             } else {
-                gameWindow.updateMessage("One of your ships is completely destroyed!");
+                gameWindow.updateMessage("", "One of your ships is completely destroyed!");
                 if (playerBoard.isAllShot()) {
                     return;
                 }
@@ -210,7 +199,7 @@ public class SeaBattle implements PlayerAction {
         int shot = playerBoard.getShot(n);
         if (shot >= 0) handleGoodShot(n);
         else gameWindow.drawOnLeft(new ShipBoard.Miss(n));
-        gameWindow.updateMessage("Computer shoots to cell " + n);
+        gameWindow.updateMessage("Computer shoots to cell " + n, "");
         return shot;
     }
 
@@ -235,7 +224,7 @@ public class SeaBattle implements PlayerAction {
             n = getValidRandom(forRandomPick); // catch pseudoShots and shots from smartShot
         }
         int shot = playerBoard.getShot(n);
-        gameWindow.updateMessage("Computer shoots to cell " + n);
+        gameWindow.updateMessage("Computer shoots to cell " + n, "");
         if (shot >= 0) handleGoodShot(n);
         else gameWindow.drawOnLeft(new ShipBoard.Miss(n));
         return shot;

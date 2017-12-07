@@ -7,7 +7,6 @@ public class PlayerShipBoard extends ShipBoard{
 
     //manually place ship
     public void placeShip(Ship ship, int id, boolean[] usedCells) {
-        //ship.draw();
         for (int n : ship.getSurrounded()) {
             usedCells[n] = true;
         }
