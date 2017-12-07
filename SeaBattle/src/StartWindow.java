@@ -39,7 +39,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
                     handler.passCoordinates(e.getX(), e.getY(), state,scale);
                     repaint();
                     state = State.CHOOSE_ORIENT;
-                    handler.passAction(State.CHOOSE_ORIENT);
+                    handler.passState(State.CHOOSE_ORIENT);
                 }
             }
         });
@@ -133,7 +133,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         autoBuildButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                handler.passAction(State.AUTO_BUILD_SHIPS);
+                handler.passState(State.AUTO_BUILD_SHIPS);
                 repaint();
                 startShooting();
                 revalidate();
@@ -144,7 +144,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         manuallyBuildButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                handler.passAction(State.CHOOSE_ORIENT);
+                handler.passState(State.CHOOSE_ORIENT);
                 revalidate();
                 repaint();
             }
@@ -202,7 +202,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         newGame.addActionListener(new ActionListener() { //anonymous inner class to implement methos specific to this source
             @Override
             public void actionPerformed(ActionEvent e) {
-                handler.passAction(State.NEW_GAME);
+                handler.passState(State.NEW_GAME);
                 refresh();
             }
         });
