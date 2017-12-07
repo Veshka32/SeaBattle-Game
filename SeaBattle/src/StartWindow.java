@@ -1,5 +1,4 @@
 import edu.princeton.cs.algs4.Bag;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -80,14 +79,16 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
 
         public MyPanel() {
             setBorder(BorderFactory.createLineBorder(Color.black));
+            setBorder(BorderFactory.createStrokeBorder(new BasicStroke(5.0f)));
             setBackground(Color.WHITE);
         }
 
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
+            int scale=getPreferredSize().height/10;
             for (Drawable d : objectsForDraw) {
-                d.draw(g);
+                d.draw(g,scale);
             }
         }
 
@@ -226,5 +227,4 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
             }
         });
     }
-
 }

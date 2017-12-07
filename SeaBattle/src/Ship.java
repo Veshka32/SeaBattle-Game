@@ -72,24 +72,24 @@ public class Ship implements Drawable{
         damaged++;
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics g,int scale) {
         ((Graphics2D)g).setStroke(new BasicStroke(5.0f));
         g.setColor(Color.BLACK);
         int xLeft;
-        if (start % 10 == 0) xLeft = (10-1)*50;
-        else xLeft = (start % 10-1)*50;
+        if (start % 10 == 0) xLeft = (10-1)*scale;
+        else xLeft = (start % 10-1)*scale;
         int yTop;
-        if (start % 10 == 0) yTop = (start / 10-1)*50;
-        else yTop = start / 10 *50;
+        if (start % 10 == 0) yTop = (start / 10-1)*scale;
+        else yTop = start / 10 *scale;
 
         int xRight;
         int yBottom;
         if (!orientation) {
-            xRight = xLeft + 50;
-            yBottom = yTop - size*50;
+            xRight = xLeft + scale;
+            yBottom = yTop - size*scale;
         } else {
-            xRight = xLeft + size*50;
-            yBottom = yTop - 1*50;
+            xRight = xLeft + size*scale;
+            yBottom = yTop - scale;
         }
 
         int width=(xRight-xLeft);

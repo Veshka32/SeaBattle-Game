@@ -10,16 +10,16 @@ public class ShipBoard implements Drawable{
 
     public ShipBoard() {    }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics g,int scale) {
         g.setColor(Color.BLACK);
         ((Graphics2D)g).setStroke(new BasicStroke(0.0f));
 
-        for (int i = 0; i < 501; i+=50) {
-            g.drawLine(0, i, 500, i);
+        for (int i = scale; i < scale*10; i+=scale) {
+            g.drawLine(0, i, scale*10, i);
         }
 
-        for (int i = 0; i < 501; i+=50) {
-            g.drawLine(i, 0, i, 500);
+        for (int i = scale; i < scale*10; i+=scale) {
+            g.drawLine(i, 0, i, scale*10);
         }
     }
 
@@ -49,10 +49,11 @@ public class ShipBoard implements Drawable{
             this.n=n;
         }
 
-        public void draw(Graphics g){
+        public void draw(Graphics g,int scale){
             g.setColor(Color.BLACK);
+            int diameter=24;
             ((Graphics2D)g).setStroke(new BasicStroke(5.0f));
-            g.drawOval(getX(n)+12,getY(n)+12,24,24);
+            g.drawOval(getX(n,scale)+diameter/2,getY(n,scale)+diameter/2,diameter,diameter);
         }
     }
 
@@ -66,21 +67,22 @@ public class ShipBoard implements Drawable{
             this.n=n;
         }
         @Override
-        public void draw(Graphics g) {
+        public void draw(Graphics g,int scale) {
             g.setColor(Color.RED);
             ((Graphics2D)g).setStroke(new BasicStroke(5.0f));
-            g.fillOval(getX(n)+12,getY(n)+12,24,24);
+            int diameter=24;
+            g.fillOval(getX(n,scale)+diameter/2,getY(n,scale)+diameter/2,diameter,diameter);
         }
     }
 
-    public static int getX(int n) {
-        if (n % 10 == 0) return 9*50;
-        else return (n % 10-1)*50;
+    public static int getX(int n,int scale) {
+        if (n % 10 == 0) return 9*scale;
+        else return (n % 10-1)*scale;
     }
 
-    public static int getY(int n) {
-        if (n % 10 == 0) return (n / 10-1)*50;
-        else return n / 10 *50;
+    public static int getY(int n, int scale) {
+        if (n % 10 == 0) return (n / 10-1)*scale;
+        else return n / 10 *scale;
     }
 
     public void autoPlaceShips() {
