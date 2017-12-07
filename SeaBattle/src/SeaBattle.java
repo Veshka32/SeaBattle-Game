@@ -1,3 +1,7 @@
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 import java.util.Stack;
 
 /* Implements SeaBattle game, Player vs Computer. Number of ships and its length is fix. Player can place ships manually or automatically (random)
@@ -8,8 +12,10 @@ public class SeaBattle implements PlayerAction {
     private ShipBoard computerBoard;
     private boolean[] usedCells; //for Player
     private int[] forRandomPick; //for computer
+    private ArrayList<Integer> forPreferredPick=new ArrayList<>();
     private int i; // current index in shipsSize
     private StartWindow gameWindow;
+    private boolean isShipOfLength4Dead=false;
 
     //for computer SmartMove
     private Stack<Integer> forSmartPick = new Stack<>();
@@ -22,6 +28,36 @@ public class SeaBattle implements PlayerAction {
 
     public SeaBattle() {
         play();
+    }
+
+    private void buildPreferredPick4(){
+        int[] temp={1,5,9,12,16,20,23,27,34,38};
+        for (int i:temp){
+            forPreferredPick.add(i);
+            forPreferredPick.add(i+40);
+            if (i+80<101) forPreferredPick.add(i+80);
+        }
+    }
+
+    //init
+    public void play() {
+        if (gameWindow == null) {
+            gameWindow = new StartWindow();
+            gameWindow.setHandler(this);
+        }
+        playerBoard = new PlayerShipBoard();
+        computerBoard = new ShipBoard();
+        computerBoard.autoPlaceShips();
+        usedCells = new boolean[101];
+        i = 1;
+        resetSmartFields();
+        forRandomPick = new int[101];
+        for (int j = 1; j < forRandomPick.length; j++) {
+            forRandomPick[j] = j;
+        }
+        buildPreferredPick4();
+        forRandomPick[0] = 1; //set start for random pick
+        state = State.DO_NOTHING;
     }
 
     public void passCoordinates(int x, int y, State s,int scale) {
@@ -118,25 +154,7 @@ public class SeaBattle implements PlayerAction {
 
     }
 
-    public void play() {
-        if (gameWindow == null) {
-            gameWindow = new StartWindow();
-            gameWindow.setHandler(this);
-        }
-        playerBoard = new PlayerShipBoard();
-        computerBoard = new ShipBoard();
-        computerBoard.autoPlaceShips();
-        usedCells = new boolean[101];
-        i = 1;
 
-        resetSmartFields();
-        forRandomPick = new int[101];
-        for (int j = 1; j < forRandomPick.length; j++) {
-            forRandomPick[j] = j;
-        }
-        forRandomPick[0] = 1; //start for random pick
-        state = State.DO_NOTHING;
-    }
 
     private boolean isValidClickForBuildShip(int start, int size, boolean orient) {
         int distToEdge;
@@ -165,6 +183,7 @@ public class SeaBattle implements PlayerAction {
                 if (playerBoard.isAllShot()) {
                     return;
                 }
+                if (shot==1) {isShipOfLength4Dead=true; System.out.println("4 is done");}
                 Ship destroyed = playerBoard.getDestroyedShip(shot);
                 for (int n : destroyed.getSurrounded()) {
                     playerBoard.playerGetPseudoShot(n);
@@ -218,10 +237,22 @@ public class SeaBattle implements PlayerAction {
         return validRandom;
     }
 
+    private int getPreferred(){
+        Random r=new Random();
+        int random=r.nextInt(forPreferredPick.size());
+        int n=forPreferredPick.get(random);
+        forPreferredPick.remove(random);
+        return n;
+    }
+
     private int computerMakesRandomShot() {
-        int n = getValidRandom(forRandomPick);
+        int n;
+        if (!isShipOfLength4Dead) n=getPreferred();
+        else n = getValidRandom(forRandomPick);
+        // catch pseudoShots and shots from smartShot
         while (playerBoard.isCellChecked(n)) {
-            n = getValidRandom(forRandomPick); // catch pseudoShots and shots from smartShot
+            if (!isShipOfLength4Dead) n=getPreferred();
+            else n = getValidRandom(forRandomPick);
         }
         int shot = playerBoard.getShot(n);
         gameWindow.updateMessage("Computer shoots to cell " + n, "");
