@@ -15,7 +15,6 @@ public class SeaBattle implements PlayerAction {
     private ArrayList<Integer> forPreferredPick=new ArrayList<>();
     private int i; // current index in shipsSize
     private StartWindow gameWindow;
-    private boolean isShipOfLength4Dead=false;
 
     //for computer SmartMove
     private Stack<Integer> forSmartPick = new Stack<>();
@@ -183,7 +182,7 @@ public class SeaBattle implements PlayerAction {
                 if (playerBoard.isAllShot()) {
                     return;
                 }
-                if (shot==1) {isShipOfLength4Dead=true; System.out.println("4 is done");}
+                if (shot==1) forPreferredPick=new ArrayList<>();
                 Ship destroyed = playerBoard.getDestroyedShip(shot);
                 for (int n : destroyed.getSurrounded()) {
                     playerBoard.playerGetPseudoShot(n);
@@ -247,11 +246,11 @@ public class SeaBattle implements PlayerAction {
 
     private int computerMakesRandomShot() {
         int n;
-        if (!isShipOfLength4Dead) n=getPreferred();
+        if (forPreferredPick.size()>0) n=getPreferred();
         else n = getValidRandom(forRandomPick);
         // catch pseudoShots and shots from smartShot
         while (playerBoard.isCellChecked(n)) {
-            if (!isShipOfLength4Dead) n=getPreferred();
+            if (forPreferredPick.size()>0) n=getPreferred();
             else n = getValidRandom(forRandomPick);
         }
         int shot = playerBoard.getShot(n);
