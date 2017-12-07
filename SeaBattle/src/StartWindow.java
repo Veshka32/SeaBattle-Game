@@ -1,7 +1,7 @@
-import edu.princeton.cs.algs4.Bag;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayDeque;
 
 public class StartWindow extends JFrame { //StartWindow is a top-level container
     Container cp;
@@ -76,7 +76,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
     }
 
     public class MyPanel extends JPanel {
-        public Bag<Drawable> objectsForDraw = new Bag<>();
+        public ArrayDeque<Drawable> objectsForDraw = new ArrayDeque<>();
 
         public MyPanel() {
             setBorder(BorderFactory.createLineBorder(Color.black));
@@ -98,7 +98,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         }
 
         public void eraseAll() {
-            objectsForDraw = new Bag<>();
+            objectsForDraw.clear();
         }
 
         @Override
