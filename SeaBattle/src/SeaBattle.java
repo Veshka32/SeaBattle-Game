@@ -24,10 +24,10 @@ public class SeaBattle implements PlayerAction {
         play();
     }
 
-    public void passCoordinates(int x, int y, State s) {
+    public void passCoordinates(int x, int y, State s,int scale) {
         state = s;
-        int xx = x / 50 + 1;
-        int yy = y / 50 + 1;
+        int xx = x / scale + 1;
+        int yy = y / scale + 1;
         switch (state) {
             case BUILD_HORIZONTAL_SHIP:
                 buildShip(xx, yy, true);

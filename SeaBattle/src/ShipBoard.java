@@ -51,9 +51,9 @@ public class ShipBoard implements Drawable{
 
         public void draw(Graphics g,int scale){
             g.setColor(Color.BLACK);
-            int diameter=24;
-            ((Graphics2D)g).setStroke(new BasicStroke(5.0f));
-            g.drawOval(getX(n,scale)+diameter/2,getY(n,scale)+diameter/2,diameter,diameter);
+            int diameter=(int)(scale*0.3); //0.7 - size of object/size of board cell
+            ((Graphics2D)g).setStroke(new BasicStroke(4.0f));
+            g.drawOval(getX(n,scale)+(scale-diameter)/2,getY(n,scale)+(scale-diameter)/2,diameter,diameter);
         }
     }
 
@@ -69,9 +69,9 @@ public class ShipBoard implements Drawable{
         @Override
         public void draw(Graphics g,int scale) {
             g.setColor(Color.RED);
-            ((Graphics2D)g).setStroke(new BasicStroke(5.0f));
-            int diameter=24;
-            g.fillOval(getX(n,scale)+diameter/2,getY(n,scale)+diameter/2,diameter,diameter);
+            ((Graphics2D)g).setStroke(new BasicStroke(4.0f));
+            int diameter=(int)(scale*0.5); //0.7 - size of object/size of board cell
+            g.fillOval(getX(n,scale)+(scale-diameter)/2,getY(n,scale)+(scale-diameter)/2,diameter,diameter);
         }
     }
 

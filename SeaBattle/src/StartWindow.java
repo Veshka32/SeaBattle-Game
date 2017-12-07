@@ -13,6 +13,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
     MyPanel rightBoard = new MyPanel();
     State state;
     PlayerAction handler;
+    int scale;
 
     public StartWindow() {
         cp = getContentPane(); //top-level container
@@ -26,7 +27,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
             @Override
             public void mousePressed(MouseEvent e) {
                 if (state == State.MAKE_MOVE)
-                    handler.passCoordinates(e.getX(), e.getY(), State.MAKE_MOVE);
+                    handler.passCoordinates(e.getX(), e.getY(),state,scale);
                 repaint();
             }
         });
@@ -35,7 +36,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
             @Override
             public void mousePressed(MouseEvent e) {
                 if (state == State.BUILD_HORIZONTAL_SHIP || state == State.BUILD_VERTICAL_SHIP) {
-                    handler.passCoordinates(e.getX(), e.getY(), state);
+                    handler.passCoordinates(e.getX(), e.getY(), state,scale);
                     repaint();
                     state = State.CHOOSE_ORIENT;
                     handler.passAction(State.CHOOSE_ORIENT);
@@ -86,7 +87,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
-            int scale=getPreferredSize().height/10;
+            scale=getPreferredSize().height/10;
             for (Drawable d : objectsForDraw) {
                 d.draw(g,scale);
             }
