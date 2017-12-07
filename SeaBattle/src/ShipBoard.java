@@ -1,12 +1,12 @@
 import java.awt.*;
-import java.util.Arrays;
 import java.util.Random;
 
 public class ShipBoard implements Drawable{
     int[] field = new int[101]; //0 - unchecked cell, >0 - cell occupied with ship, -1 - checked
-    private final int totalShipsLength = 20;
+    private final int TOTAL_SHIP_LENGTH = 20;
     int numberOfDestroyedCells = 0;
     Ship[] ships = new Ship[11];
+    public static final int GAMEBOARD_DIMENTION=10;
 
     public ShipBoard() {    }
 
@@ -14,12 +14,12 @@ public class ShipBoard implements Drawable{
         g.setColor(Color.BLACK);
         ((Graphics2D)g).setStroke(new BasicStroke(0.0f));
 
-        for (int i = scale; i < scale*10; i+=scale) {
-            g.drawLine(0, i, scale*10, i);
+        for (int i = scale; i < scale*GAMEBOARD_DIMENTION; i+=scale) {
+            g.drawLine(0, i, scale*GAMEBOARD_DIMENTION, i);
         }
 
-        for (int i = scale; i < scale*10; i+=scale) {
-            g.drawLine(i, 0, i, scale*10);
+        for (int i = scale; i < scale*GAMEBOARD_DIMENTION; i+=scale) {
+            g.drawLine(i, 0, i, scale*GAMEBOARD_DIMENTION);
         }
     }
 
@@ -40,7 +40,7 @@ public class ShipBoard implements Drawable{
     }
     //detect end of the game
     public boolean isAllShot() {
-        return numberOfDestroyedCells == totalShipsLength;
+        return numberOfDestroyedCells == TOTAL_SHIP_LENGTH;
     }
 
     static class Miss implements Drawable{
@@ -51,7 +51,7 @@ public class ShipBoard implements Drawable{
 
         public void draw(Graphics g,int scale){
             g.setColor(Color.BLACK);
-            int diameter=(int)(scale*0.3); //0.7 - size of object/size of board cell
+            int diameter=(int)(scale*0.3); //0.3 = size of object/size of board cell
             ((Graphics2D)g).setStroke(new BasicStroke(4.0f));
             g.drawOval(getX(n,scale)+(scale-diameter)/2,getY(n,scale)+(scale-diameter)/2,diameter,diameter);
         }
@@ -70,19 +70,19 @@ public class ShipBoard implements Drawable{
         public void draw(Graphics g,int scale) {
             g.setColor(Color.RED);
             ((Graphics2D)g).setStroke(new BasicStroke(4.0f));
-            int diameter=(int)(scale*0.5); //0.7 - size of object/size of board cell
+            int diameter=(int)(scale*0.5); //0.5 - size of object/size of board cell
             g.fillOval(getX(n,scale)+(scale-diameter)/2,getY(n,scale)+(scale-diameter)/2,diameter,diameter);
         }
     }
 
     public static int getX(int n,int scale) {
-        if (n % 10 == 0) return 9*scale;
-        else return (n % 10-1)*scale;
+        if (n % GAMEBOARD_DIMENTION == 0) return (GAMEBOARD_DIMENTION-1)*scale;
+        else return (n % GAMEBOARD_DIMENTION-1)*scale;
     }
 
     public static int getY(int n, int scale) {
-        if (n % 10 == 0) return (n / 10-1)*scale;
-        else return n / 10 *scale;
+        if (n % GAMEBOARD_DIMENTION == 0) return (n / GAMEBOARD_DIMENTION-1)*scale;
+        else return n / GAMEBOARD_DIMENTION *scale;
     }
 
     public void autoPlaceShips() {
@@ -127,14 +127,14 @@ public class ShipBoard implements Drawable{
         if (start < 1 || start > 100) return false;
         int distToEdge;
         if (orient) {
-            distToEdge = 10 - start % 10;
+            distToEdge = GAMEBOARD_DIMENTION - start % GAMEBOARD_DIMENTION;
         } else {
             int row;
-            if (start % 10 == 0) row = start / 10;
-            else row = start / 10 + 1;
-            distToEdge = 10 - row;
+            if (start % GAMEBOARD_DIMENTION == 0) row = start / GAMEBOARD_DIMENTION;
+            else row = start / GAMEBOARD_DIMENTION + 1;
+            distToEdge = GAMEBOARD_DIMENTION - row;
         }
-        return size - 1 <= distToEdge && distToEdge != 10;
+        return size - 1 <= distToEdge && distToEdge != GAMEBOARD_DIMENTION;
     }
 
     private void autoBuildShip(int size, int id, boolean orient, int[] forRandomPick, boolean[] used) {
@@ -146,13 +146,11 @@ public class ShipBoard implements Drawable{
             start = getValidShipStart(size, orient, forRandomPick);
             ships[id] = new Ship(orient, start, size);
         }
-        //if (leftCornerX == 0) ships[id].draw();
-
         //update usedCells
         for (int n : ships[id].getSurrounded()) {
             used[n] = true;
         }
-        for (int n : ships[id].position()) field[n] = id; //
+        for (int n : ships[id].position()) field[n] = id;
     }
 
     public Ship[] getAllShips(){
@@ -179,10 +177,4 @@ public class ShipBoard implements Drawable{
         array[b] = temp;
         array[0]++;
     }
-
-    public static void main(String[] args) {
-
-    }
-
-
 }

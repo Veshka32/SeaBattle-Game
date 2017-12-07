@@ -219,13 +219,13 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         return menuBar;
     }
 
-    public static void main(String[] args) {
-        //To run the constructor on the event-dispatching thread,
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new StartWindow();  // Let the constructor do the job
-            }
-        });
-    }
+//    public static void main(String[] args) {
+//        //To run the constructor on the event-dispatching thread,
+//        SwingUtilities.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                new StartWindow();  // Let the constructor do the job
+//            }
+//        });
+//    }
 }

@@ -98,19 +98,6 @@ public class Ship implements Drawable{
         g.drawRect(xLeft,yTop,width,height);
 
     }
-
-    public static void main(String[] args) {
-        ArrayList<Integer> t=new ArrayList<>();
-
-            int[] temp={1,5,9,12,16,20,23,27,34,38};
-            for (int i:temp){
-                t.add(i);
-                t.add(i+40);
-                if (i+80<101) t.add(i+80);
-            }
-
-        System.out.println(t.toString());
-    }
 }
 
 
