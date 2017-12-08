@@ -3,7 +3,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayDeque;
 
-public class StartWindow extends JFrame { //StartWindow is a top-level container
+import static javax.swing.JOptionPane.showMessageDialog;
+
+public class GameWindow extends JFrame { //GameWindow is a top-level container
     private Container cp;
     private JPanel messagePanel = new JPanel(new BorderLayout());
     private JPanel buttonPanel = new JPanel();
@@ -14,19 +16,17 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
     private State state;
     private PlayerAction handler;
 
-    public StartWindow() {
+    public GameWindow() {
         cp = getContentPane(); //top-level container
         cp.setLayout(new BorderLayout()); //default arrange components
         //set messagePanel
         messagePanel.setPreferredSize(new Dimension(GameConstant.DRAW_FIELD_DIMENSION*2+GameConstant.CELL_SIZE, 100));
         messagePanel.setBorder(BorderFactory.createLineBorder(Color.black));
-        messagePanel.add(message, BorderLayout.NORTH);
-        messagePanel.add(message1, BorderLayout.CENTER);
         rightBoard.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (state == State.MAKE_MOVE)
-                    handler.passCoordinates(e.getX(), e.getY(),state);
+                    handler.onMouseClicked(e.getX(), e.getY(),state);
                 repaint();
             }
         });
@@ -35,10 +35,10 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
             @Override
             public void mousePressed(MouseEvent e) {
                 if (state == State.BUILD_HORIZONTAL_SHIP || state == State.BUILD_VERTICAL_SHIP) {
-                    handler.passCoordinates(e.getX(), e.getY(), state);
+                    handler.onMouseClicked(e.getX(), e.getY(), state);
                     repaint();
                     state = State.CHOOSE_ORIENT;
-                    handler.passState(State.CHOOSE_ORIENT);
+                    handler.onPassState(State.CHOOSE_ORIENT);
                 }
             }
         });
@@ -67,6 +67,10 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         if (!s.equals("")) message.setText(s);
         if (!s1.equals("")) message1.setText(s1);
         revalidate();
+    }
+
+    public void showException(){
+        showMessageDialog(this, "You may not place ship here");
     }
 
     public void updateState(State s) {
@@ -131,7 +135,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         autoBuildButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                handler.passState(State.AUTO_BUILD_SHIPS);
+                handler.onPassState(State.AUTO_BUILD_SHIPS);
                 repaint();
                 startShooting();
                 revalidate();
@@ -142,7 +146,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         manuallyBuildButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                handler.passState(State.CHOOSE_ORIENT);
+                handler.onPassState(State.CHOOSE_ORIENT);
                 revalidate();
                 repaint();
             }
@@ -200,7 +204,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         newGame.addActionListener(new ActionListener() { //anonymous inner class to implement methos specific to this source
             @Override
             public void actionPerformed(ActionEvent e) {
-                handler.passState(State.NEW_GAME);
+                handler.onPassState(State.NEW_GAME);
                 refresh();
             }
         });
@@ -222,7 +226,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
 //        SwingUtilities.invokeLater(new Runnable() {
 //            @Override
 //            public void run() {
-//                new StartWindow();  // Let the constructor do the job
+//                new GameWindow();  // Let the constructor do the job
 //            }
 //        });
 //    }

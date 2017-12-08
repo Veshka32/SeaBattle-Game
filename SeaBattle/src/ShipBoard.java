@@ -101,7 +101,6 @@ public class ShipBoard implements Drawable{
             if (choice) autoBuildShip(GameConstant.SHIPS_SIZE[i], i, GameConstant.HORIZONTAL, forRandomPickX, used);
             else autoBuildShip(GameConstant.SHIPS_SIZE[i], i, GameConstant.VERTICAL, forRandomPickY, used);
         }
-        System.out.println("Done!");
     }
 
     public int getRandom(int from, int to) {

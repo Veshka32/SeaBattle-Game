@@ -5,14 +5,13 @@ import java.util.Random;
 /* Implements SeaBattle game, Player vs Computer. Number of ships and its length is fix. Player can place ships manually or automatically (random). Computer make strategy shots while biggest ship (of length 4) is not destroyed. Once computer shot one of the ships, it tries to end up with this ship, and only after this continue to make random (strategy effective) shots.
 */
 public class SeaBattle implements PlayerAction {
-    private final int[] shipsSize = GameConstant.SHIPS_SIZE; //ships length
     private PlayerShipBoard playerBoard;
     private ShipBoard computerBoard;
-    private boolean[] usedCells; //for Player
+    private boolean[] cellsUsedForShipBuilding; //for building ships by player
     private int[] forRandomPick; //for computer
     private ArrayList<Integer> forPreferredPick=new ArrayList<>();
     private int i; // current index in shipsSize
-    private StartWindow gameWindow;
+    private GameWindow gameWindow;
 
     //for computer SmartMove
     private ArrayDeque<Integer> forSmartPick = new ArrayDeque<>();
@@ -35,17 +34,16 @@ public class SeaBattle implements PlayerAction {
             if (i+80<=GameConstant.DIMENSION) forPreferredPick.add(i+GameConstant.DIMENSION);
         }
     }
-
     //init
     public void play() {
         if (gameWindow == null) {
-            gameWindow = new StartWindow();
+            gameWindow = new GameWindow();
             gameWindow.setHandler(this);
         }
         playerBoard = new PlayerShipBoard();
         computerBoard = new ShipBoard();
         computerBoard.autoPlaceShips();
-        usedCells = new boolean[GameConstant.CELLS_COUNT +1];
+        cellsUsedForShipBuilding = new boolean[GameConstant.CELLS_COUNT +1];
         i = 1;
         resetSmartFields();
         forRandomPick = new int[GameConstant.CELLS_COUNT +1];
@@ -57,7 +55,7 @@ public class SeaBattle implements PlayerAction {
         state = State.DO_NOTHING;
     }
 
-    public void passCoordinates(int x, int y, State s) {
+    public void onMouseClicked(int x, int y, State s) {
         state = s;
         int xx = x / GameConstant.CELL_SIZE + 1;
         int yy = y / GameConstant.CELL_SIZE + 1;
@@ -74,17 +72,17 @@ public class SeaBattle implements PlayerAction {
         }
     }
 
-    public void passState(State s) {
+    public void onPassState(State s) {
         state = s;
         switch (state) {
             case NEW_GAME:
                 this.play();
                 break;
             case CHOOSE_ORIENT:
-                if (i == shipsSize.length) gameWindow.startShooting();
+                if (i == GameConstant.SHIPS_SIZE.length) gameWindow.startShooting();
                 else {
-                    gameWindow.updateMessage("Build ship of length " + shipsSize[i], "");
-                    if (shipsSize[i] == 1) {
+                    gameWindow.updateMessage("Build ship of length " + GameConstant.SHIPS_SIZE[i], "");
+                    if (GameConstant.SHIPS_SIZE[i] == 1) {
                         gameWindow.updateMessage("", " ");
                         gameWindow.updateState(State.BUILD_HORIZONTAL_SHIP);
                     } else gameWindow.chooseOrientation();
@@ -135,22 +133,25 @@ public class SeaBattle implements PlayerAction {
         }
     }
 
-    private void buildShip(int x, int y, boolean orientation) {
+    private void buildShip(int x, int y, boolean orientation)  {
         int coordinate = (y - 1) * GameConstant.DIMENSION + x;
-        int size = shipsSize[i];
+        int size = GameConstant.SHIPS_SIZE[i];
         Ship ship = new Ship(orientation, coordinate, size);
-        if (!playerBoard.isShipValid(ship, usedCells) || !isValidClickForBuildShip(coordinate, size, orientation)) {
-            gameWindow.updateMessage("You may not place ship here", "");
-            gameWindow.chooseOrientation();
+        if (!playerBoard.isShipValid(ship, cellsUsedForShipBuilding) || !isValidClickForBuildShip(coordinate, size, orientation)) {
+            state=State.DO_NOTHING;
+            gameWindow.showException();
+            if (size==1) gameWindow.updateState(State.BUILD_HORIZONTAL_SHIP);
+            else gameWindow.chooseOrientation();
             return;
         }
         state = State.DO_NOTHING;
-        playerBoard.placeShip(ship, i, usedCells);
+        playerBoard.placeShip(ship, i, cellsUsedForShipBuilding);
         gameWindow.drawOnLeft(ship);
         i++;
     }
 
     private boolean isValidClickForBuildShip(int start, int size, boolean isHorizontal) {
+        if (size==1) return true;
         int dim=GameConstant.DIMENSION;
         int distToEdge;
         if (isHorizontal) {
@@ -265,9 +266,5 @@ public class SeaBattle implements PlayerAction {
         if (goodShotsSoFar == 2) {
             orientSoFar = goodShotSoFarMax - goodShotSoFarMin == 1;
         }
-    }
-
-    public static void main(String[] args) {
-        SeaBattle newGame = new SeaBattle();
     }
 }
