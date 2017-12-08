@@ -1,25 +1,25 @@
 import java.awt.*;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class ShipBoard implements Drawable{
-    int[] field = new int[101]; //0 - unchecked cell, >0 - cell occupied with ship, -1 - checked
-    private final int TOTAL_SHIP_LENGTH = 20;
-    int numberOfDestroyedCells = 0;
-    Ship[] ships = new Ship[11];
-    public static final int GAMEBOARD_DIMENTION=10;
+    int[] field = new int[GameConstant.CELLS_COUNT+1]; //0 - unchecked cell, >0 - cell occupied with ship, -1 - checked
+    private final int TOTAL_SHIP_LENGTH = IntStream.of(GameConstant.SHIPS_SIZE).sum();
+    private int damagedCellsCount = 0;
+    Ship[] ships = new Ship[GameConstant.SHIPS_COUNT+1];
 
     public ShipBoard() {    }
 
-    public void draw(Graphics g,int scale) {
+    public void draw(Graphics g) {
         g.setColor(Color.BLACK);
         ((Graphics2D)g).setStroke(new BasicStroke(0.0f));
 
-        for (int i = scale; i < scale*GAMEBOARD_DIMENTION; i+=scale) {
-            g.drawLine(0, i, scale*GAMEBOARD_DIMENTION, i);
+        for (int i = GameConstant.CELL_SIZE; i < GameConstant.CELL_SIZE *GameConstant.DIMENSION; i+=GameConstant.CELL_SIZE) {
+            g.drawLine(0, i, GameConstant.CELL_SIZE *GameConstant.DIMENSION, i);
         }
 
-        for (int i = scale; i < scale*GAMEBOARD_DIMENTION; i+=scale) {
-            g.drawLine(i, 0, i, scale*GAMEBOARD_DIMENTION);
+        for (int i = GameConstant.CELL_SIZE; i < GameConstant.CELL_SIZE *GameConstant.DIMENSION; i+=GameConstant.CELL_SIZE) {
+            g.drawLine(i, 0, i, GameConstant.CELL_SIZE *GameConstant.DIMENSION);
         }
     }
 
@@ -32,15 +32,15 @@ public class ShipBoard implements Drawable{
         }
         ships[id].getShot();
         if (ships[id].isDestroyed()) {
-            numberOfDestroyedCells++;
+            damagedCellsCount++;
             return id;
         }
-        numberOfDestroyedCells++;
+        damagedCellsCount++;
         return 0;
     }
     //detect end of the game
     public boolean isAllShot() {
-        return numberOfDestroyedCells == TOTAL_SHIP_LENGTH;
+        return damagedCellsCount == TOTAL_SHIP_LENGTH;
     }
 
     static class Miss implements Drawable{
@@ -49,11 +49,11 @@ public class ShipBoard implements Drawable{
             this.n=n;
         }
 
-        public void draw(Graphics g,int scale){
+        public void draw(Graphics g){
             g.setColor(Color.BLACK);
-            int diameter=(int)(scale*0.3); //0.3 = size of object/size of board cell
+            int diameter=(int)(GameConstant.CELL_SIZE *0.3); //0.3 = size of object/size of board cell
             ((Graphics2D)g).setStroke(new BasicStroke(4.0f));
-            g.drawOval(getX(n,scale)+(scale-diameter)/2,getY(n,scale)+(scale-diameter)/2,diameter,diameter);
+            g.drawOval(getX(n)+(GameConstant.CELL_SIZE -diameter)/2,getY(n)+(GameConstant.CELL_SIZE -diameter)/2,diameter,diameter);
         }
     }
 
@@ -67,29 +67,28 @@ public class ShipBoard implements Drawable{
             this.n=n;
         }
         @Override
-        public void draw(Graphics g,int scale) {
+        public void draw(Graphics g) {
             g.setColor(Color.RED);
             ((Graphics2D)g).setStroke(new BasicStroke(4.0f));
-            int diameter=(int)(scale*0.5); //0.5 - size of object/size of board cell
-            g.fillOval(getX(n,scale)+(scale-diameter)/2,getY(n,scale)+(scale-diameter)/2,diameter,diameter);
+            int diameter=(int)(GameConstant.CELL_SIZE *0.5); //0.5 - size of object/size of board cell
+            g.fillOval(getX(n)+(GameConstant.CELL_SIZE -diameter)/2,getY(n)+(GameConstant.CELL_SIZE -diameter)/2,diameter,diameter);
         }
     }
 
-    public static int getX(int n,int scale) {
-        if (n % GAMEBOARD_DIMENTION == 0) return (GAMEBOARD_DIMENTION-1)*scale;
-        else return (n % GAMEBOARD_DIMENTION-1)*scale;
+    public static int getX(int n) {
+        if (n % GameConstant.DIMENSION == 0) return (GameConstant.DIMENSION -1)*GameConstant.CELL_SIZE;
+        else return (n % GameConstant.DIMENSION -1)*GameConstant.CELL_SIZE;
     }
 
-    public static int getY(int n, int scale) {
-        if (n % GAMEBOARD_DIMENTION == 0) return (n / GAMEBOARD_DIMENTION-1)*scale;
-        else return n / GAMEBOARD_DIMENTION *scale;
+    public static int getY(int n) {
+        if (n % GameConstant.DIMENSION == 0) return (n / GameConstant.DIMENSION -1)*GameConstant.CELL_SIZE;
+        else return n / GameConstant.DIMENSION *GameConstant.CELL_SIZE;
     }
 
     public void autoPlaceShips() {
-        int[] shipsSize = new int[]{0, 4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
-        boolean[] used = new boolean[101];
-        int[] forRandomPickX = new int[101];
-        int[] forRandomPickY = new int[101];
+        boolean[] used = new boolean[GameConstant.CELLS_COUNT+1];
+        int[] forRandomPickX = new int[GameConstant.CELLS_COUNT+1];
+        int[] forRandomPickY = new int[GameConstant.CELLS_COUNT+1];
         for (int i = 1; i < forRandomPickX.length; i++) {
             forRandomPickX[i] = i;
             forRandomPickY[i] = i;
@@ -97,10 +96,10 @@ public class ShipBoard implements Drawable{
         forRandomPickX[0] = 1; //lower bound for random pick
         forRandomPickY[0] = 1;
         Random random = new Random();
-        for (int i = 1; i < shipsSize.length; i++) {
+        for (int i = 1; i < GameConstant.SHIPS_SIZE.length; i++) {
             boolean choice = random.nextBoolean();
-            if (choice) autoBuildShip(shipsSize[i], i, true, forRandomPickX, used);
-            else autoBuildShip(shipsSize[i], i, false, forRandomPickY, used);
+            if (choice) autoBuildShip(GameConstant.SHIPS_SIZE[i], i, GameConstant.HORIZONTAL, forRandomPickX, used);
+            else autoBuildShip(GameConstant.SHIPS_SIZE[i], i, GameConstant.VERTICAL, forRandomPickY, used);
         }
         System.out.println("Done!");
     }
@@ -111,12 +110,12 @@ public class ShipBoard implements Drawable{
     }
 
     private int getValidShipStart(int size, boolean orient, int[] forRandomPick) {
-        int position = getRandom(forRandomPick[0], 101);
+        int position = getRandom(forRandomPick[0], GameConstant.CELLS_COUNT+1);
         int start = forRandomPick[position];
         update(forRandomPick, position);
 
         while (!isValidStartForBuildShip(start, size, orient)) {
-            position = getRandom(forRandomPick[0], 101);
+            position = getRandom(forRandomPick[0], GameConstant.CELLS_COUNT+1);
             start = forRandomPick[position];
             update(forRandomPick, position);
         }
@@ -124,17 +123,17 @@ public class ShipBoard implements Drawable{
     }
 
     private boolean isValidStartForBuildShip(int start, int size, boolean orient) {
-        if (start < 1 || start > 100) return false;
+        if (start < 1 || start > GameConstant.CELLS_COUNT+1) return false;
         int distToEdge;
         if (orient) {
-            distToEdge = GAMEBOARD_DIMENTION - start % GAMEBOARD_DIMENTION;
+            distToEdge = GameConstant.DIMENSION - start % GameConstant.DIMENSION;
         } else {
             int row;
-            if (start % GAMEBOARD_DIMENTION == 0) row = start / GAMEBOARD_DIMENTION;
-            else row = start / GAMEBOARD_DIMENTION + 1;
-            distToEdge = GAMEBOARD_DIMENTION - row;
+            if (start % GameConstant.DIMENSION == 0) row = start / GameConstant.DIMENSION;
+            else row = start / GameConstant.DIMENSION + 1;
+            distToEdge = GameConstant.DIMENSION - row;
         }
-        return size - 1 <= distToEdge && distToEdge != GAMEBOARD_DIMENTION;
+        return size - 1 <= distToEdge && distToEdge != GameConstant.DIMENSION;
     }
 
     private void autoBuildShip(int size, int id, boolean orient, int[] forRandomPick, boolean[] used) {
@@ -154,8 +153,8 @@ public class ShipBoard implements Drawable{
     }
 
     public Ship[] getAllShips(){
-        Ship[] allShips=new Ship[10];
-        System.arraycopy(ships,1,allShips,0,10);
+        Ship[] allShips=new Ship[ships.length-1];
+        System.arraycopy(ships,1,allShips,0,ships.length-1);
         return allShips;
     }
 

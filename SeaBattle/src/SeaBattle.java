@@ -5,15 +5,13 @@ import java.util.Random;
 /* Implements SeaBattle game, Player vs Computer. Number of ships and its length is fix. Player can place ships manually or automatically (random). Computer make strategy shots while biggest ship (of length 4) is not destroyed. Once computer shot one of the ships, it tries to end up with this ship, and only after this continue to make random (strategy effective) shots.
 */
 public class SeaBattle implements PlayerAction {
-    public static final int GAMEBOARD_DIMENTION=10;
-    public static final int NUMBER_OF_CELLS_IN_GAMEBOARD=100;
-    private final int[] shipsSize = {0, 4, 3, 3, 2, 2, 2, 1, 1, 1, 1}; //ships length
+    private final int[] shipsSize = GameConstant.SHIPS_SIZE; //ships length
     private PlayerShipBoard playerBoard;
     private ShipBoard computerBoard;
     private boolean[] usedCells; //for Player
     private int[] forRandomPick; //for computer
     private ArrayList<Integer> forPreferredPick=new ArrayList<>();
-    private int i; // current index in shipsSize 
+    private int i; // current index in shipsSize
     private StartWindow gameWindow;
 
     //for computer SmartMove
@@ -34,7 +32,7 @@ public class SeaBattle implements PlayerAction {
         for (int i:temp){
             forPreferredPick.add(i);
             forPreferredPick.add(i+40);
-            if (i+80<=NUMBER_OF_CELLS_IN_GAMEBOARD) forPreferredPick.add(i+80);
+            if (i+80<=GameConstant.DIMENSION) forPreferredPick.add(i+GameConstant.DIMENSION);
         }
     }
 
@@ -47,10 +45,10 @@ public class SeaBattle implements PlayerAction {
         playerBoard = new PlayerShipBoard();
         computerBoard = new ShipBoard();
         computerBoard.autoPlaceShips();
-        usedCells = new boolean[NUMBER_OF_CELLS_IN_GAMEBOARD+1];
+        usedCells = new boolean[GameConstant.CELLS_COUNT +1];
         i = 1;
         resetSmartFields();
-        forRandomPick = new int[NUMBER_OF_CELLS_IN_GAMEBOARD+1];
+        forRandomPick = new int[GameConstant.CELLS_COUNT +1];
         for (int j = 1; j < forRandomPick.length; j++) {
             forRandomPick[j] = j;
         }
@@ -59,16 +57,16 @@ public class SeaBattle implements PlayerAction {
         state = State.DO_NOTHING;
     }
 
-    public void passCoordinates(int x, int y, State s,int scale) {
+    public void passCoordinates(int x, int y, State s) {
         state = s;
-        int xx = x / scale + 1;
-        int yy = y / scale + 1;
+        int xx = x / GameConstant.CELL_SIZE + 1;
+        int yy = y / GameConstant.CELL_SIZE + 1;
         switch (state) {
             case BUILD_HORIZONTAL_SHIP:
-                buildShip(xx, yy, true);
+                buildShip(xx, yy, GameConstant.HORIZONTAL);
                 break;
             case BUILD_VERTICAL_SHIP:
-                buildShip(xx, yy, false);
+                buildShip(xx, yy, GameConstant.VERTICAL);
                 break;
             case MAKE_MOVE:
                 processUserMove(xx, yy);
@@ -105,7 +103,7 @@ public class SeaBattle implements PlayerAction {
 
     private void processUserMove(int x, int y) {
         state = State.DO_NOTHING;
-        int coordinate = (y - 1) * GAMEBOARD_DIMENTION + x;
+        int coordinate = (y - 1) * GameConstant.DIMENSION + x;
         if (computerBoard.isCellChecked(coordinate)) {
             gameWindow.updateMessage("You already shot this cell. Click another cell", "");
             return;
@@ -137,8 +135,8 @@ public class SeaBattle implements PlayerAction {
         }
     }
 
-    public void buildShip(int x, int y, boolean orientation) {
-        int coordinate = (y - 1) * GAMEBOARD_DIMENTION + x;
+    private void buildShip(int x, int y, boolean orientation) {
+        int coordinate = (y - 1) * GameConstant.DIMENSION + x;
         int size = shipsSize[i];
         Ship ship = new Ship(orientation, coordinate, size);
         if (!playerBoard.isShipValid(ship, usedCells) || !isValidClickForBuildShip(coordinate, size, orientation)) {
@@ -152,17 +150,18 @@ public class SeaBattle implements PlayerAction {
         i++;
     }
 
-    private boolean isValidClickForBuildShip(int start, int size, boolean orient) {
+    private boolean isValidClickForBuildShip(int start, int size, boolean isHorizontal) {
+        int dim=GameConstant.DIMENSION;
         int distToEdge;
-        if (orient) {
-            distToEdge = GAMEBOARD_DIMENTION - start % GAMEBOARD_DIMENTION;
+        if (isHorizontal) {
+            distToEdge = dim - start % dim;
         } else {
             int row;
-            if (start % GAMEBOARD_DIMENTION == 0) row = start / GAMEBOARD_DIMENTION;
-            else row = start / GAMEBOARD_DIMENTION + 1;
-            distToEdge = GAMEBOARD_DIMENTION - row;
+            if (start % dim == 0) row = start / dim;
+            else row = start / dim + 1;
+            distToEdge = dim - row;
         }
-        return size - 1 <= distToEdge && distToEdge != GAMEBOARD_DIMENTION;
+        return size - 1 <= distToEdge && distToEdge != dim;
     }
 
     private void computerMove() {
@@ -193,9 +192,9 @@ public class SeaBattle implements PlayerAction {
 
     private int computerMakesSmartShot() {
         if (goodShotsSoFar == 1 && forSmartPick.isEmpty()) {
-            int[] possible = {prev - 1, prev + 1, prev - GAMEBOARD_DIMENTION, prev + GAMEBOARD_DIMENTION};
+            int[] possible = {prev - 1, prev + 1, prev - GameConstant.DIMENSION, prev + GameConstant.DIMENSION};
             for (int m : possible) {
-                if (m > 0 && m <=NUMBER_OF_CELLS_IN_GAMEBOARD && !playerBoard.isCellChecked(m)) {
+                if (m > 0 && m <=GameConstant.CELLS_COUNT && !playerBoard.isCellChecked(m)) {
                     forSmartPick.push(m);
                 }
             }
@@ -203,9 +202,9 @@ public class SeaBattle implements PlayerAction {
             forSmartPick.clear();
             int[] possible;
             if (orientSoFar) possible = new int[]{goodShotSoFarMin - 1, goodShotSoFarMax + 1};
-            else possible = new int[]{goodShotSoFarMin - GAMEBOARD_DIMENTION, goodShotSoFarMax + GAMEBOARD_DIMENTION};
+            else possible = new int[]{goodShotSoFarMin - GameConstant.DIMENSION, goodShotSoFarMax + GameConstant.DIMENSION};
             for (int m : possible) {
-                if (m > 0 && m <=NUMBER_OF_CELLS_IN_GAMEBOARD && !playerBoard.isCellChecked(m)) {
+                if (m > 0 && m <=GameConstant.CELLS_COUNT && !playerBoard.isCellChecked(m)) {
                     forSmartPick.push(m);
                 }
             }
@@ -227,7 +226,7 @@ public class SeaBattle implements PlayerAction {
     }
 
     private int getValidRandom(int[] forRandomPick) {
-        int position = computerBoard.getRandom(forRandomPick[0], NUMBER_OF_CELLS_IN_GAMEBOARD+1);
+        int position = computerBoard.getRandom(forRandomPick[0], GameConstant.CELLS_COUNT +1);
         int validRandom = forRandomPick[position];
         computerBoard.update(forRandomPick, position);
         return validRandom;

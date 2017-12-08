@@ -1,5 +1,5 @@
 import java.awt.*;
 
 public interface Drawable {
-    void draw(Graphics g,int d);
+    void draw(Graphics g);
 }

@@ -4,22 +4,21 @@ import java.awt.event.*;
 import java.util.ArrayDeque;
 
 public class StartWindow extends JFrame { //StartWindow is a top-level container
-    Container cp;
-    JPanel messagePanel = new JPanel(new BorderLayout());
-    JPanel buttonPanel = new JPanel();
-    JLabel message = new JLabel("Welcome to SeaBattle");
-    JLabel message1 = new JLabel("Message 1");
-    MyPanel leftBoard = new MyPanel();
-    MyPanel rightBoard = new MyPanel();
-    State state;
-    PlayerAction handler;
-    int scale;
+    private Container cp;
+    private JPanel messagePanel = new JPanel(new BorderLayout());
+    private JPanel buttonPanel = new JPanel();
+    private JLabel message = new JLabel("Welcome to SeaBattle");
+    private JLabel message1 = new JLabel("Message 1");
+    private MyPanel leftBoard = new MyPanel();
+    private MyPanel rightBoard = new MyPanel();
+    private State state;
+    private PlayerAction handler;
 
     public StartWindow() {
         cp = getContentPane(); //top-level container
         cp.setLayout(new BorderLayout()); //default arrange components
         //set messagePanel
-        messagePanel.setPreferredSize(new Dimension(1050, 100));
+        messagePanel.setPreferredSize(new Dimension(GameConstant.DRAW_FIELD_DIMENSION*2+GameConstant.CELL_SIZE, 100));
         messagePanel.setBorder(BorderFactory.createLineBorder(Color.black));
         messagePanel.add(message, BorderLayout.NORTH);
         messagePanel.add(message1, BorderLayout.CENTER);
@@ -27,7 +26,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
             @Override
             public void mousePressed(MouseEvent e) {
                 if (state == State.MAKE_MOVE)
-                    handler.passCoordinates(e.getX(), e.getY(),state,scale);
+                    handler.passCoordinates(e.getX(), e.getY(),state);
                 repaint();
             }
         });
@@ -36,7 +35,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
             @Override
             public void mousePressed(MouseEvent e) {
                 if (state == State.BUILD_HORIZONTAL_SHIP || state == State.BUILD_VERTICAL_SHIP) {
-                    handler.passCoordinates(e.getX(), e.getY(), state,scale);
+                    handler.passCoordinates(e.getX(), e.getY(), state);
                     repaint();
                     state = State.CHOOSE_ORIENT;
                     handler.passState(State.CHOOSE_ORIENT);
@@ -87,9 +86,8 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
-            scale=getPreferredSize().height/10;
             for (Drawable d : objectsForDraw) {
-                d.draw(g,scale);
+                d.draw(g);
             }
         }
 
@@ -103,11 +101,11 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
 
         @Override
         public Dimension getPreferredSize() {
-            return new Dimension(500, 500);
+            return new Dimension(GameConstant.DRAW_FIELD_DIMENSION, GameConstant.DRAW_FIELD_DIMENSION);
         }
     }
 
-    public void refresh() {
+    private void refresh() {
         leftBoard.eraseAll();
         leftBoard.addDrawable(new ShipBoard());
         rightBoard.eraseAll();
@@ -127,7 +125,7 @@ public class StartWindow extends JFrame { //StartWindow is a top-level container
         revalidate();
     }
 
-    public void chooseGameMode() {
+    private void chooseGameMode() {
         messagePanel.removeAll();
         JButton autoBuildButton = new JButton("Auto");
         autoBuildButton.addActionListener(new ActionListener() {
