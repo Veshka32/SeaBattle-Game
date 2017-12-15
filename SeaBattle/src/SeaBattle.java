@@ -2,8 +2,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Random;
 
-/* Implements SeaBattle game, Player vs Computer. Number of ships and its length is fix. Player can place ships manually or automatically (random). Computer make strategy shots while biggest ship (of length 4) is not destroyed. Once computer shot one of the ships, it tries to end up with this ship, and only after this continue to make random (strategy effective) shots.
-*/
 public class SeaBattle implements PlayerAction {
     private PlayerShipBoard playerBoard;
     private ShipBoard computerBoard;
@@ -22,7 +20,7 @@ public class SeaBattle implements PlayerAction {
     private int prev;
     private State state; //current game state
 
-    public SeaBattle() {
+    SeaBattle() {
         play();
     }
 
@@ -35,7 +33,7 @@ public class SeaBattle implements PlayerAction {
         }
     }
     //init
-    public void play() {
+    private void play() {
         if (gameWindow == null) {
             gameWindow = new GameWindow();
             gameWindow.setHandler(this);
