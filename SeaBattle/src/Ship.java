@@ -1,7 +1,5 @@
-import edu.princeton.cs.algs4.Queue;
-
-
 import java.awt.*;
+import java.util.ArrayDeque;
 /*Create a ship places on ShipBoard for SeaBattle game.
  */
 
@@ -11,14 +9,14 @@ public class Ship implements Drawable{
     private final boolean isHorizontal;
     private int damagedCellCount = 0; //number of damage cells in ship so far;
 
-    public Ship(boolean isHorizontal, int start, int size) {
+    Ship(boolean isHorizontal, int start, int size) {
         this.isHorizontal = isHorizontal;
         this.start = start;
         this.size = size;
     }
 
     //return cells ship occupies
-    public int[] position() {
+    int[] position() {
         if (size == 1) return new int[]{start};
         int[] location = new int[size];
         int j;
@@ -31,8 +29,8 @@ public class Ship implements Drawable{
     }
 
     //return cells  ship occupies and surrounded cells
-    public Queue<Integer> getSurrounded() {
-        Queue<Integer> s = new Queue<>();
+    ArrayDeque<Integer> getSurrounded() {
+        ArrayDeque<Integer> s = new ArrayDeque<>();
         int j = 0;
         int k = 1;
         boolean topLeft = true;
@@ -43,9 +41,9 @@ public class Ship implements Drawable{
             if (start <=GameConstant.DIMENSION) topLeft = false;
             else if (start > GameConstant.CELLS_COUNT-GameConstant.DIMENSION) bottomRight = false;
             for (int i = -1 + j; i < size + k; i++) {
-                if (topLeft) s.enqueue(start + i - GameConstant.DIMENSION);
-                if (bottomRight) s.enqueue(start + i + GameConstant.DIMENSION);
-                s.enqueue(start + i);
+                if (topLeft) s.add(start + i - GameConstant.DIMENSION);
+                if (bottomRight) s.add(start + i + GameConstant.DIMENSION);
+                s.add(start + i);
             }
         } else {
             if (start <=GameConstant.DIMENSION) j = 1;
@@ -53,19 +51,19 @@ public class Ship implements Drawable{
             if (start % GameConstant.DIMENSION == 1) topLeft = false;
             else if (start % GameConstant.DIMENSION == 0) bottomRight = false;
             for (int i = -GameConstant.DIMENSION + j * GameConstant.DIMENSION; i < (size + k) *GameConstant.DIMENSION; i += GameConstant.DIMENSION) {
-                if (topLeft) s.enqueue(start + i - 1);
-                if (bottomRight) s.enqueue(start + i + 1);
-                s.enqueue(start + i);
+                if (topLeft) s.add(start + i - 1);
+                if (bottomRight) s.add(start + i + 1);
+                s.add(start + i);
             }
         }
         return s;
     }
 
-    public boolean isDestroyed() {
+    boolean isDestroyed() {
         return damagedCellCount == size;
     }
 
-    public void getShot() {
+    void getShot() {
         damagedCellCount++;
     }
 
