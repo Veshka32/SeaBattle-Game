@@ -82,7 +82,6 @@ public class GameWindow extends JFrame { //GameWindow is a top-level container
         public ArrayDeque<Drawable> objectsForDraw = new ArrayDeque<>();
 
         public MyPanel() {
-            setBorder(BorderFactory.createLineBorder(Color.black));
             setBorder(BorderFactory.createStrokeBorder(new BasicStroke(5.0f)));
             setBackground(Color.WHITE);
         }
@@ -164,28 +163,21 @@ public class GameWindow extends JFrame { //GameWindow is a top-level container
 
     public void chooseOrientation() {
         state = State.DO_NOTHING;
-        message1.setText("Choose orientation of ship");
-        buttonPanel.removeAll();
-        JButton horizontal = new JButton("Horizontal");
-        horizontal.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                message1.setText("Build horizontal ship");
-                buttonPanel.removeAll();
-                state = State.BUILD_HORIZONTAL_SHIP;
-            }
-        });
-        JButton vertical = new JButton("Vertical");
-        vertical.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                message1.setText("Build vertical ship");
-                buttonPanel.removeAll();
-                state = State.BUILD_VERTICAL_SHIP;
-            }
-        });
-        buttonPanel.add(horizontal);
-        buttonPanel.add(vertical);
+        Object[] options = {"Horizontal",
+                "Vertical"};
+        int n = JOptionPane.showOptionDialog(this,
+                "Choose orientation of ship",
+                "",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,     //do not use a custom Icon
+                options,  //the titles of buttons
+                options[0]); //default button title
+        if (n == 0) {
+            message1.setText("Build horizontal ship");
+            state = State.BUILD_HORIZONTAL_SHIP;
+        } else {message1.setText("Build vertical ship");
+            state = State.BUILD_VERTICAL_SHIP;};
     }
 
     public void startShooting() {
@@ -220,14 +212,4 @@ public class GameWindow extends JFrame { //GameWindow is a top-level container
         menu.add(exit);
         return menuBar;
     }
-
-//    public static void main(String[] args) {
-//        //To run the constructor on the event-dispatching thread,
-//        SwingUtilities.invokeLater(new Runnable() {
-//            @Override
-//            public void run() {
-//                new GameWindow();  // Let the constructor do the job
-//            }
-//        });
-//    }
 }
